@@ -3,7 +3,11 @@ import axios from "axios";
 const API = "https://proyecto-final-be-pyt.onrender.com/api/profile";
 
 const getToken = () => {
-  return localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+
+  console.log("TOKEN EN PROFILE:", token); // 👈 DEBUG
+
+  return token;
 };
 
 // obtener perfil
