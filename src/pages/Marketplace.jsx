@@ -9,7 +9,7 @@ import {
 
 import { addToCart } from "../services/cartService";
 import { getProfile } from "../services/profileService";
-import { addReview } from "../services/reviewService"; // 🔥 NUEVO
+import { addReview } from "../services/reviewService";
 
 function Marketplace() {
 
@@ -26,7 +26,6 @@ function Marketplace() {
     image: ""
   });
 
-  // 🔥 NUEVO (estado de reseñas por producto)
   const [reviewsData, setReviewsData] = useState({});
 
   // ===============================
@@ -54,6 +53,15 @@ function Marketplace() {
     loadProducts();
     loadUser();
   }, []);
+
+  // ===============================
+  // 🔥 VALIDAR SI COMPRÓ
+  // ===============================
+  const hasPurchased = (productId) => {
+    return user?.purchases?.some(
+      p => String(p.productId) === String(productId)
+    );
+  };
 
   // ===============================
   // FORM PRODUCTO
@@ -168,7 +176,6 @@ function Marketplace() {
 
       alert("Reseña enviada ⭐");
 
-      // limpiar
       setReviewsData(prev => ({
         ...prev,
         [productId]: { rating: "", comment: "" }
@@ -178,7 +185,7 @@ function Marketplace() {
 
     } catch (error) {
       console.error(error);
-      alert("Error al enviar reseña");
+      alert(error.response?.data?.error || "Error al enviar reseña");
     }
 
   };
@@ -292,39 +299,49 @@ function Marketplace() {
 
               <hr />
 
-              {/* ⭐ RESEÑA */}
-              <h4>Calificar</h4>
+              {/* ⭐ RESEÑA PROTEGIDA */}
+              {
+                hasPurchased(product.id) ? (
 
-              <select
-                value={reviewsData[product.id]?.rating || ""}
-                onChange={(e) =>
-                  handleReviewChange(product.id, "rating", e.target.value)
-                }
-              >
-                <option value="">Selecciona</option>
-                <option value="5">5 ⭐</option>
-                <option value="4">4 ⭐</option>
-                <option value="3">3 ⭐</option>
-                <option value="2">2 ⭐</option>
-                <option value="1">1 ⭐</option>
-              </select>
+                  <>
+                    <h4>Calificar</h4>
 
-              <br /><br />
+                    <select
+                      value={reviewsData[product.id]?.rating || ""}
+                      onChange={(e) =>
+                        handleReviewChange(product.id, "rating", e.target.value)
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      <option value="5">5 ⭐</option>
+                      <option value="4">4 ⭐</option>
+                      <option value="3">3 ⭐</option>
+                      <option value="2">2 ⭐</option>
+                      <option value="1">1 ⭐</option>
+                    </select>
 
-              <input
-                type="text"
-                placeholder="Comentario"
-                value={reviewsData[product.id]?.comment || ""}
-                onChange={(e) =>
-                  handleReviewChange(product.id, "comment", e.target.value)
-                }
-              />
+                    <br /><br />
 
-              <br /><br />
+                    <input
+                      type="text"
+                      placeholder="Comentario"
+                      value={reviewsData[product.id]?.comment || ""}
+                      onChange={(e) =>
+                        handleReviewChange(product.id, "comment", e.target.value)
+                      }
+                    />
 
-              <button onClick={() => handleReviewSubmit(product.id)}>
-                Enviar reseña ⭐
-              </button>
+                    <br /><br />
+
+                    <button onClick={() => handleReviewSubmit(product.id)}>
+                      Enviar reseña ⭐
+                    </button>
+                  </>
+
+                ) : (
+                  <p>⚠️ Compra este producto para poder calificar</p>
+                )
+              }
 
             </div>
 
