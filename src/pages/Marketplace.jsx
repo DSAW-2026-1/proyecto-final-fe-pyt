@@ -9,6 +9,7 @@ import {
 
 import { addToCart } from "../services/cartService";
 import { getProfile } from "../services/profileService";
+import { addReview } from "../services/reviewService"; // 🔥 NUEVO
 
 function Marketplace() {
 
@@ -24,6 +25,9 @@ function Marketplace() {
     stock: "",
     image: ""
   });
+
+  // 🔥 NUEVO (estado de reseñas por producto)
+  const [reviewsData, setReviewsData] = useState({});
 
   // ===============================
   // CARGAR DATOS
@@ -52,7 +56,7 @@ function Marketplace() {
   }, []);
 
   // ===============================
-  // FORM
+  // FORM PRODUCTO
   // ===============================
   const handleChange = (e) => {
     setForm({
@@ -97,7 +101,7 @@ function Marketplace() {
       loadProducts();
     } catch (error) {
       console.error(error);
-      alert("No autorizado");
+      alert("Error al eliminar");
     }
   };
 
@@ -132,6 +136,54 @@ function Marketplace() {
   };
 
   // ===============================
+  // ⭐ RESEÑAS
+  // ===============================
+  const handleReviewChange = (productId, field, value) => {
+
+    setReviewsData(prev => ({
+      ...prev,
+      [productId]: {
+        ...prev[productId],
+        [field]: value
+      }
+    }));
+
+  };
+
+  const handleReviewSubmit = async (productId) => {
+
+    const review = reviewsData[productId];
+
+    if (!review || !review.rating) {
+      return alert("Selecciona una calificación");
+    }
+
+    try {
+
+      await addReview({
+        productId,
+        rating: review.rating,
+        comment: review.comment
+      });
+
+      alert("Reseña enviada ⭐");
+
+      // limpiar
+      setReviewsData(prev => ({
+        ...prev,
+        [productId]: { rating: "", comment: "" }
+      }));
+
+      loadProducts();
+
+    } catch (error) {
+      console.error(error);
+      alert("Error al enviar reseña");
+    }
+
+  };
+
+  // ===============================
   // UI
   // ===============================
   return (
@@ -150,54 +202,25 @@ function Marketplace() {
 
             <form onSubmit={handleSubmit}>
 
-              <input
-                type="text"
-                name="title"
-                placeholder="Título"
-                value={form.title}
-                onChange={handleChange}
-              />
-
+              <input name="title" placeholder="Título" value={form.title} onChange={handleChange} />
               <br /><br />
 
-              <input
-                type="number"
-                name="price"
-                placeholder="Precio"
-                value={form.price}
-                onChange={handleChange}
-              />
-
+              <input type="number" name="price" placeholder="Precio" value={form.price} onChange={handleChange} />
               <br /><br />
 
-              <textarea
-                name="description"
-                placeholder="Descripción"
-                value={form.description}
-                onChange={handleChange}
-              />
-
+              <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} />
               <br /><br />
 
-              <select
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-              >
+              <select name="category" value={form.category} onChange={handleChange}>
                 <option value="">Categoría</option>
                 <option value="Tecnología">Tecnología</option>
                 <option value="Libros">Libros</option>
                 <option value="Ropa">Ropa</option>
-                <option value="Accesorios">Accesorios</option>
               </select>
 
               <br /><br />
 
-              <select
-                name="condition"
-                value={form.condition}
-                onChange={handleChange}
-              >
+              <select name="condition" value={form.condition} onChange={handleChange}>
                 <option value="">Condición</option>
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
@@ -205,39 +228,19 @@ function Marketplace() {
 
               <br /><br />
 
-              <input
-                type="number"
-                name="stock"
-                placeholder="Stock"
-                value={form.stock}
-                onChange={handleChange}
-              />
-
+              <input type="number" name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} />
               <br /><br />
 
-              <input
-                type="text"
-                name="image"
-                placeholder="URL de imagen"
-                value={form.image}
-                onChange={handleChange}
-              />
-
+              <input name="image" placeholder="URL imagen" value={form.image} onChange={handleChange} />
               <br /><br />
 
-              <button type="submit">
-                Publicar
-              </button>
+              <button type="submit">Publicar</button>
 
             </form>
           </>
 
         ) : (
-
-          <h2>
-            ⚠️ Debes convertirte en vendedor para publicar productos
-          </h2>
-
+          <h2>⚠️ Debes ser vendedor</h2>
         )
       }
 
@@ -245,97 +248,83 @@ function Marketplace() {
 
       <h2>Productos</h2>
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px"
-        }}
-      >
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
 
         {
           products.map(product => (
 
-            <div
-              key={product.id}
-              style={{
-                border: "1px solid gray",
-                padding: "15px",
-                width: "300px",
-                borderRadius: "10px"
-              }}
-            >
+            <div key={product.id} style={{ border: "1px solid gray", padding: 15, width: 300 }}>
 
-              <img
-                src={product.image}
-                alt={product.title}
-                width="250"
-                style={{ borderRadius: "10px" }}
-              />
+              <img src={product.image} alt={product.title} width="250" />
 
               <h3>{product.title}</h3>
-
               <p>{product.description}</p>
 
-              <p><strong>Categoría:</strong> {product.category}</p>
-
-              <p><strong>Condición:</strong> {product.condition}</p>
-
-              <p><strong>Stock:</strong> {product.stock}</p>
-
+              <p>Stock: {product.stock}</p>
               <strong>${product.price}</strong>
 
-              {/* 🔥 NUEVO: INFO DEL VENDEDOR */}
-              <p><strong>Vendedor:</strong> {product.sellerInfo?.name}</p>
-
+              {/* INFO VENDEDOR */}
+              <p>Vendedor: {product.sellerInfo?.name}</p>
               <p>
-                <strong>Calificación:</strong>{" "}
-                {
+                Rating: {
                   product.sellerInfo?.rating === "Nuevo"
                     ? "Nuevo vendedor"
                     : product.sellerInfo?.rating + " ⭐"
                 }
               </p>
+              <p>Contacto: {product.sellerInfo?.email}</p>
 
-              <p>
-                <strong>Contacto:</strong> {product.sellerInfo?.email}
-              </p>
+              <br />
 
-              <br /><br />
-
-              <button
-                onClick={() => handleAddToCart(product.id)}
-              >
-                🛒 Agregar al carrito
+              <button onClick={() => handleAddToCart(product.id)}>
+                🛒 Carrito
               </button>
 
-              <br /><br />
-
+              {/* EDITAR / ELIMINAR */}
               {
-                (
-                  user?.id === product.seller ||
-                  user?.role === "admin"
-                ) && (
-
-                  <div>
-
-                    <button
-                      onClick={() => handleEdit(product)}
-                    >
-                      ✏️ Editar
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      style={{ marginLeft: "10px" }}
-                    >
-                      🗑️ Eliminar
-                    </button>
-
-                  </div>
-
+                (user?.id === product.seller || user?.role === "admin") && (
+                  <>
+                    <button onClick={() => handleEdit(product)}>✏️</button>
+                    <button onClick={() => handleDelete(product.id)}>🗑️</button>
+                  </>
                 )
               }
+
+              <hr />
+
+              {/* ⭐ RESEÑA */}
+              <h4>Calificar</h4>
+
+              <select
+                value={reviewsData[product.id]?.rating || ""}
+                onChange={(e) =>
+                  handleReviewChange(product.id, "rating", e.target.value)
+                }
+              >
+                <option value="">Selecciona</option>
+                <option value="5">5 ⭐</option>
+                <option value="4">4 ⭐</option>
+                <option value="3">3 ⭐</option>
+                <option value="2">2 ⭐</option>
+                <option value="1">1 ⭐</option>
+              </select>
+
+              <br /><br />
+
+              <input
+                type="text"
+                placeholder="Comentario"
+                value={reviewsData[product.id]?.comment || ""}
+                onChange={(e) =>
+                  handleReviewChange(product.id, "comment", e.target.value)
+                }
+              />
+
+              <br /><br />
+
+              <button onClick={() => handleReviewSubmit(product.id)}>
+                Enviar reseña ⭐
+              </button>
 
             </div>
 
