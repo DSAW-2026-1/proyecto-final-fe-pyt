@@ -11,6 +11,10 @@ import Navbar from "./components/Navbar";
 
 import PrivateRoute from "./routes/PrivateRoute";
 
+import Purchases from "./pages/Purchases";
+
+<Route path="/purchases" element={<Purchases />} />
+
 function App() {
   return (
     <BrowserRouter>
