@@ -8,10 +8,12 @@ import {
 } from "../services/productService";
 
 import { addToCart } from "../services/cartService";
+import { getProfile } from "../services/profileService";
 
 function Marketplace() {
 
   const [products, setProducts] = useState([]);
+  const [user, setUser] = useState(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -23,46 +25,48 @@ function Marketplace() {
     image: ""
   });
 
-  // usuario logueado
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
-
   // cargar productos
   const loadProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error cargando productos", error);
+    }
+  };
 
-    const data = await getProducts();
-
-    setProducts(data);
-
+  // cargar usuario
+  const loadUser = async () => {
+    try {
+      const data = await getProfile();
+      setUser(data);
+    } catch (error) {
+      console.error("Error cargando usuario", error);
+    }
   };
 
   useEffect(() => {
     loadProducts();
+    loadUser();
   }, []);
 
   // manejar inputs
   const handleChange = (e) => {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
-
   };
 
   // crear producto
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     try {
-
       await createProduct(form);
 
       alert("Producto publicado ✅");
 
-      // limpiar formulario
       setForm({
         title: "",
         price: "",
@@ -76,34 +80,21 @@ function Marketplace() {
       loadProducts();
 
     } catch (error) {
-
       console.error(error);
-
       alert("Error al publicar producto");
-
     }
-
   };
 
   // eliminar producto
   const handleDelete = async (id) => {
-
     try {
-
       await deleteProduct(id);
-
       alert("Producto eliminado ✅");
-
       loadProducts();
-
     } catch (error) {
-
       console.error(error);
-
       alert("No autorizado");
-
     }
-
   };
 
   // editar producto
@@ -117,46 +108,30 @@ function Marketplace() {
     if (!newTitle) return;
 
     try {
-
-      await updateProduct(
-        product.id,
-        {
-          ...product,
-          title: newTitle
-        }
-      );
+      await updateProduct(product.id, {
+        ...product,
+        title: newTitle
+      });
 
       alert("Producto actualizado ✅");
 
       loadProducts();
 
     } catch (error) {
-
       console.error(error);
-
       alert("Error al editar");
-
     }
-
   };
 
   // agregar al carrito
   const handleAddToCart = async (id) => {
-
     try {
-
       await addToCart(id);
-
       alert("Producto agregado al carrito 🛒");
-
     } catch (error) {
-
       console.error(error);
-
       alert("Error al agregar al carrito");
-
     }
-
   };
 
   return (
@@ -166,116 +141,105 @@ function Marketplace() {
 
       <hr />
 
-      <h2>Publicar producto</h2>
+      {/* 🔥 FORMULARIO SOLO PARA VENDEDORES */}
+      {
+        user?.isSeller ? (
 
-      <form onSubmit={handleSubmit}>
+          <>
+            <h2>Publicar producto</h2>
 
-        <input
-          type="text"
-          name="title"
-          placeholder="Título"
-          value={form.title}
-          onChange={handleChange}
-        />
+            <form onSubmit={handleSubmit}>
 
-        <br /><br />
+              <input
+                type="text"
+                name="title"
+                placeholder="Título"
+                value={form.title}
+                onChange={handleChange}
+              />
 
-        <input
-          type="number"
-          name="price"
-          placeholder="Precio"
-          value={form.price}
-          onChange={handleChange}
-        />
+              <br /><br />
 
-        <br /><br />
+              <input
+                type="number"
+                name="price"
+                placeholder="Precio"
+                value={form.price}
+                onChange={handleChange}
+              />
 
-        <textarea
-          name="description"
-          placeholder="Descripción"
-          value={form.description}
-          onChange={handleChange}
-        />
+              <br /><br />
 
-        <br /><br />
+              <textarea
+                name="description"
+                placeholder="Descripción"
+                value={form.description}
+                onChange={handleChange}
+              />
 
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-        >
+              <br /><br />
 
-          <option value="">
-            Categoría
-          </option>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+              >
+                <option value="">Categoría</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Libros">Libros</option>
+                <option value="Ropa">Ropa</option>
+                <option value="Accesorios">Accesorios</option>
+              </select>
 
-          <option value="Tecnología">
-            Tecnología
-          </option>
+              <br /><br />
 
-          <option value="Libros">
-            Libros
-          </option>
+              <select
+                name="condition"
+                value={form.condition}
+                onChange={handleChange}
+              >
+                <option value="">Condición</option>
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado">Usado</option>
+              </select>
 
-          <option value="Ropa">
-            Ropa
-          </option>
+              <br /><br />
 
-          <option value="Accesorios">
-            Accesorios
-          </option>
+              <input
+                type="number"
+                name="stock"
+                placeholder="Stock"
+                value={form.stock}
+                onChange={handleChange}
+              />
 
-        </select>
+              <br /><br />
 
-        <br /><br />
+              <input
+                type="text"
+                name="image"
+                placeholder="URL de imagen"
+                value={form.image}
+                onChange={handleChange}
+              />
 
-        <select
-          name="condition"
-          value={form.condition}
-          onChange={handleChange}
-        >
+              <br /><br />
 
-          <option value="">
-            Condición
-          </option>
+              <button type="submit">
+                Publicar
+              </button>
 
-          <option value="Nuevo">
-            Nuevo
-          </option>
+            </form>
+          </>
 
-          <option value="Usado">
-            Usado
-          </option>
+        ) : (
 
-        </select>
+          <h2>
+            ⚠️ Debes convertirte en vendedor para publicar productos
+          </h2>
 
-        <br /><br />
-
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={form.stock}
-          onChange={handleChange}
-        />
-
-        <br /><br />
-
-        <input
-          type="text"
-          name="image"
-          placeholder="URL de imagen"
-          value={form.image}
-          onChange={handleChange}
-        />
-
-        <br /><br />
-
-        <button type="submit">
-          Publicar
-        </button>
-
-      </form>
+        )
+      }
 
       <hr />
 
@@ -306,30 +270,20 @@ function Marketplace() {
                 src={product.image}
                 alt={product.title}
                 width="250"
-                style={{
-                  borderRadius: "10px"
-                }}
+                style={{ borderRadius: "10px" }}
               />
 
               <h3>{product.title}</h3>
 
               <p>{product.description}</p>
 
-              <p>
-                <strong>Categoría:</strong> {product.category}
-              </p>
+              <p><strong>Categoría:</strong> {product.category}</p>
 
-              <p>
-                <strong>Condición:</strong> {product.condition}
-              </p>
+              <p><strong>Condición:</strong> {product.condition}</p>
 
-              <p>
-                <strong>Stock:</strong> {product.stock}
-              </p>
+              <p><strong>Stock:</strong> {product.stock}</p>
 
-              <strong>
-                ${product.price}
-              </strong>
+              <strong>${product.price}</strong>
 
               <br /><br />
 
@@ -361,9 +315,7 @@ function Marketplace() {
                       onClick={() =>
                         handleDelete(product.id)
                       }
-                      style={{
-                        marginLeft: "10px"
-                      }}
+                      style={{ marginLeft: "10px" }}
                     >
                       🗑️ Eliminar
                     </button>
