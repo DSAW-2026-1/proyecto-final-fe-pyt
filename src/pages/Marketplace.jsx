@@ -25,7 +25,9 @@ function Marketplace() {
     image: ""
   });
 
-  // cargar productos
+  // ===============================
+  // CARGAR DATOS
+  // ===============================
   const loadProducts = async () => {
     try {
       const data = await getProducts();
@@ -35,7 +37,6 @@ function Marketplace() {
     }
   };
 
-  // cargar usuario
   const loadUser = async () => {
     try {
       const data = await getProfile();
@@ -50,7 +51,9 @@ function Marketplace() {
     loadUser();
   }, []);
 
-  // manejar inputs
+  // ===============================
+  // FORM
+  // ===============================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -58,7 +61,6 @@ function Marketplace() {
     });
   };
 
-  // crear producto
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,7 +87,9 @@ function Marketplace() {
     }
   };
 
-  // eliminar producto
+  // ===============================
+  // PRODUCTOS
+  // ===============================
   const handleDelete = async (id) => {
     try {
       await deleteProduct(id);
@@ -97,14 +101,9 @@ function Marketplace() {
     }
   };
 
-  // editar producto
   const handleEdit = async (product) => {
 
-    const newTitle = prompt(
-      "Nuevo título",
-      product.title
-    );
-
+    const newTitle = prompt("Nuevo título", product.title);
     if (!newTitle) return;
 
     try {
@@ -114,7 +113,6 @@ function Marketplace() {
       });
 
       alert("Producto actualizado ✅");
-
       loadProducts();
 
     } catch (error) {
@@ -123,7 +121,6 @@ function Marketplace() {
     }
   };
 
-  // agregar al carrito
   const handleAddToCart = async (id) => {
     try {
       await addToCart(id);
@@ -134,6 +131,9 @@ function Marketplace() {
     }
   };
 
+  // ===============================
+  // UI
+  // ===============================
   return (
     <div style={{ padding: "20px" }}>
 
@@ -141,7 +141,7 @@ function Marketplace() {
 
       <hr />
 
-      {/* 🔥 FORMULARIO SOLO PARA VENDEDORES */}
+      {/* FORM SOLO VENDEDORES */}
       {
         user?.isSeller ? (
 
@@ -285,12 +285,26 @@ function Marketplace() {
 
               <strong>${product.price}</strong>
 
+              {/* 🔥 NUEVO: INFO DEL VENDEDOR */}
+              <p><strong>Vendedor:</strong> {product.sellerInfo?.name}</p>
+
+              <p>
+                <strong>Calificación:</strong>{" "}
+                {
+                  product.sellerInfo?.rating === "Nuevo"
+                    ? "Nuevo vendedor"
+                    : product.sellerInfo?.rating + " ⭐"
+                }
+              </p>
+
+              <p>
+                <strong>Contacto:</strong> {product.sellerInfo?.email}
+              </p>
+
               <br /><br />
 
               <button
-                onClick={() =>
-                  handleAddToCart(product.id)
-                }
+                onClick={() => handleAddToCart(product.id)}
               >
                 🛒 Agregar al carrito
               </button>
@@ -312,9 +326,7 @@ function Marketplace() {
                     </button>
 
                     <button
-                      onClick={() =>
-                        handleDelete(product.id)
-                      }
+                      onClick={() => handleDelete(product.id)}
                       style={{ marginLeft: "10px" }}
                     >
                       🗑️ Eliminar
