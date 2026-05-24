@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:3000/api/products";
+const API = "https://proyecto-final-be-pyt.onrender.com/api/products";
 
 // obtener productos
 export const getProducts = async () => {

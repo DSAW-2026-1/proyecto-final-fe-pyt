@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:3000/api/profile";
+const API = "https://proyecto-final-be-pyt.onrender.com/api/profile";
 
 const getToken = () => {
   return localStorage.getItem("token");
