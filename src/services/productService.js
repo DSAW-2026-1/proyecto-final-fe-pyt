@@ -2,67 +2,92 @@ import axios from "axios";
 
 const API = "https://proyecto-final-be-pyt.onrender.com/api/products";
 
-// obtener productos
+// 🔥 helper para headers (evita repetir código)
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+};
+
+// ==========================
+// OBTENER PRODUCTOS
+// ==========================
 export const getProducts = async () => {
+  try {
 
-  const response = await axios.get(API);
+    const response = await axios.get(API);
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("ERROR GET PRODUCTS:", error);
+    throw error;
+  }
 };
 
-// crear producto
+// ==========================
+// CREAR PRODUCTO
+// ==========================
 export const createProduct = async (productData) => {
+  try {
 
-  const token = localStorage.getItem("token");
+    const response = await axios.post(
+      API,
+      productData,
+      getAuthHeaders()
+    );
 
-  const response = await axios.post(
-    API,
-    productData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+    return response.data;
 
-  return response.data;
-
+  } catch (error) {
+    console.error("ERROR CREATE PRODUCT:", error.response?.data || error);
+    throw error;
+  }
 };
 
-// eliminar producto
+// ==========================
+// ELIMINAR PRODUCTO
+// ==========================
 export const deleteProduct = async (id) => {
+  try {
 
-  const token = localStorage.getItem("token");
+    console.log("ELIMINANDO PRODUCTO ID:", id); // 👈 DEBUG
 
-  const response = await axios.delete(
-    `${API}/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+    const response = await axios.delete(
+      `${API}/${id}`,
+      getAuthHeaders()
+    );
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("ERROR DELETE PRODUCT:", error.response?.data || error);
+    throw error;
+  }
 };
 
-// editar producto
+// ==========================
+// EDITAR PRODUCTO
+// ==========================
 export const updateProduct = async (id, productData) => {
+  try {
 
-  const token = localStorage.getItem("token");
+    console.log("EDITANDO PRODUCTO:", id, productData); // 👈 DEBUG
 
-  const response = await axios.put(
-    `${API}/${id}`,
-    productData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+    const response = await axios.put(
+      `${API}/${id}`,
+      productData,
+      getAuthHeaders()
+    );
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("ERROR UPDATE PRODUCT:", error.response?.data || error);
+    throw error;
+  }
 };
