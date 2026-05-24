@@ -1,13 +1,19 @@
 import axios from "axios";
 
-const API = "http://localhost:3000/api/auth";
+const BASE_URL = "https://proyecto-final-be-pyt.onrender.com";
 
-export const registerUser = async (userData) => {
-  const response = await axios.post(`${API}/register`, userData);
-  return response.data;
+export const loginUser = async (data) => {
+  const res = await axios.post(
+    `${BASE_URL}/api/auth/login`,
+    data
+  );
+  return res.data;
 };
 
-export const loginUser = async (userData) => {
-  const response = await axios.post(`${API}/login`, userData);
-  return response.data;
+export const registerUser = async (data) => {
+  const res = await axios.post(
+    `${BASE_URL}/api/auth/register`,
+    data
+  );
+  return res.data;
 };
