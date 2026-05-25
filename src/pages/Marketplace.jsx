@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
   getProducts,
@@ -12,8 +11,6 @@ import { addToCart } from "../services/cartService";
 import { getProfile } from "../services/profileService";
 
 function Marketplace() {
-
-  const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [user, setUser] = useState(null);
@@ -35,11 +32,8 @@ function Marketplace() {
   // ===============================
   const loadProducts = async () => {
     try {
-
       const data = await getProducts();
-
       setProducts(data);
-
     } catch (error) {
       console.error("Error cargando productos", error);
     }
@@ -47,11 +41,8 @@ function Marketplace() {
 
   const loadUser = async () => {
     try {
-
       const data = await getProfile();
-
       setUser(data);
-
     } catch (error) {
       console.error("Error cargando usuario", error);
     }
@@ -65,27 +56,21 @@ function Marketplace() {
   // ===============================
   // BUSCADOR
   // ===============================
-  const filteredProducts = products.filter(product =>
-    product.title?.toLowerCase().includes(search.toLowerCase())
+  const filteredProducts = products.filter(p =>
+    p.title.toLowerCase().includes(search.toLowerCase())
   );
 
   // ===============================
-  // FORMULARIO
+  // FORM PRODUCTO
   // ===============================
   const handleChange = (e) => {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
-
   };
 
-  // ===============================
-  // CREAR PRODUCTO
-  // ===============================
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     if (
@@ -94,13 +79,12 @@ function Marketplace() {
       !form.description ||
       !form.category ||
       !form.condition ||
-      !form.stock
+      form.stock === ""
     ) {
-      return alert("Completa todos los campos");
+      return alert("Todos los campos son obligatorios");
     }
 
     try {
-
       await createProduct({
         ...form,
         price: Number(form.price),
@@ -122,77 +106,40 @@ function Marketplace() {
       loadProducts();
 
     } catch (error) {
-
-      console.error(error);
-
-      alert(
-        error.response?.data?.error ||
-        "Error al publicar"
-      );
+      alert(error.response?.data?.error || "Error al publicar");
     }
   };
 
   // ===============================
-  // ELIMINAR
+  // ACCIONES PRODUCTO
   // ===============================
   const handleDelete = async (id) => {
-
-    const confirmDelete = window.confirm(
-      "¿Eliminar producto?"
-    );
-
-    if (!confirmDelete) return;
-
     try {
-
       await deleteProduct(id);
-
       alert("Producto eliminado ✅");
-
       loadProducts();
-
     } catch (error) {
-
-      console.error(error);
-
-      alert(
-        error.response?.data?.error ||
-        "Error al eliminar"
-      );
+      alert(error.response?.data?.error || "Error al eliminar");
     }
   };
 
-  // ===============================
-  // EDITAR
-  // ===============================
   const handleEdit = async (product) => {
 
+    const newData = {
+      title: prompt("Título", product.title),
+      price: prompt("Precio", product.price),
+      description: prompt("Descripción", product.description),
+      category: prompt("Categoría", product.category),
+      condition: prompt("Condición (Nuevo/Usado)", product.condition),
+      stock: prompt("Stock", product.stock),
+      image: prompt("Imagen URL", product.image)
+    };
+
+    if (Object.values(newData).some(v => v === null)) {
+      return;
+    }
+
     try {
-
-      const newData = {
-
-        title:
-          prompt("Título", product.title) || product.title,
-
-        price:
-          prompt("Precio", product.price) || product.price,
-
-        description:
-          prompt("Descripción", product.description) || product.description,
-
-        category:
-          prompt("Categoría", product.category) || product.category,
-
-        condition:
-          prompt("Condición", product.condition) || product.condition,
-
-        stock:
-          prompt("Stock", product.stock) || product.stock,
-
-        image:
-          prompt("Imagen URL", product.image) || product.image
-      };
-
       await updateProduct(product.id, {
         ...newData,
         price: Number(newData.price),
@@ -200,39 +147,19 @@ function Marketplace() {
       });
 
       alert("Producto actualizado ✅");
-
       loadProducts();
 
     } catch (error) {
-
-      console.error(error);
-
-      alert(
-        error.response?.data?.error ||
-        "Error al editar"
-      );
+      alert(error.response?.data?.error || "Error al editar");
     }
   };
 
-  // ===============================
-  // AGREGAR CARRITO
-  // ===============================
   const handleAddToCart = async (id) => {
-
     try {
-
       await addToCart(id);
-
-      alert("Producto agregado al carrito 🛒");
-
+      alert("Producto agregado 🛒");
     } catch (error) {
-
-      console.error("❌ ERROR ADD CART:", error);
-
-      alert(
-        error.response?.data?.error ||
-        "Error al agregar"
-      );
+      alert(error.response?.data?.error || "Error al agregar");
     }
   };
 
@@ -240,34 +167,19 @@ function Marketplace() {
   // UI
   // ===============================
   return (
-
     <div style={{
-      background: "#F5F7FA",
+      background: "#F5F5F5",
       minHeight: "100vh",
       padding: "30px"
     }}>
 
       {/* HEADER */}
-      <div style={{
-        background: "linear-gradient(90deg, #0B3C6D, #1E5A96)",
-        padding: "30px",
-        borderRadius: "16px",
-        marginBottom: "30px",
-        color: "white"
+      <h1 style={{
+        color: "#0B3C6D",
+        marginBottom: 20
       }}>
-
-        <h1 style={{
-          margin: 0,
-          fontSize: "42px"
-        }}>
-          Mercado Sabana 🛒
-        </h1>
-
-        <p>
-          Compra y vende productos universitarios
-        </p>
-
-      </div>
+        Mercado Sabana 🛒
+      </h1>
 
       {/* BUSCADOR */}
       <input
@@ -277,273 +189,175 @@ function Marketplace() {
         onChange={(e) => setSearch(e.target.value)}
         style={{
           width: "100%",
-          padding: "14px",
-          borderRadius: "10px",
-          border: "1px solid #ccc",
-          marginBottom: "30px",
-          fontSize: "16px"
+          padding: 10,
+          marginBottom: 30,
+          borderRadius: 8,
+          border: "1px solid #ccc"
         }}
       />
 
-      {/* FORMULARIO VENDEDOR */}
+      {/* ================= FORM ================= */}
       {
         user?.isSeller && (
-
           <div style={{
             background: "white",
-            padding: "25px",
-            borderRadius: "16px",
-            marginBottom: "35px",
-            boxShadow: "0px 4px 15px rgba(0,0,0,0.08)"
+            padding: 20,
+            borderRadius: 12,
+            marginBottom: 30,
+            boxShadow: "0px 4px 12px rgba(0,0,0,0.1)"
           }}>
 
-            <h2 style={{
-              color: "#0B3C6D"
-            }}>
+            <h2 style={{ color: "#1E5A96" }}>
               Publicar producto
             </h2>
 
             <form onSubmit={handleSubmit}>
 
-              <input
-                name="title"
-                placeholder="Título"
-                value={form.title}
-                onChange={handleChange}
-              />
+              <input name="title" placeholder="Título" value={form.title} onChange={handleChange} /><br /><br />
+              <input type="number" name="price" placeholder="Precio" value={form.price} onChange={handleChange} /><br /><br />
+              <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} /><br /><br />
 
-              <br /><br />
-
-              <input
-                type="number"
-                name="price"
-                placeholder="Precio"
-                value={form.price}
-                onChange={handleChange}
-              />
-
-              <br /><br />
-
-              <textarea
-                name="description"
-                placeholder="Descripción"
-                value={form.description}
-                onChange={handleChange}
-              />
-
-              <br /><br />
-
-              <select
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-              >
+              <select name="category" value={form.category} onChange={handleChange}>
                 <option value="">Categoría</option>
                 <option value="Tecnología">Tecnología</option>
                 <option value="Libros">Libros</option>
                 <option value="Ropa">Ropa</option>
-              </select>
+              </select><br /><br />
 
-              <br /><br />
-
-              <select
-                name="condition"
-                value={form.condition}
-                onChange={handleChange}
-              >
+              <select name="condition" value={form.condition} onChange={handleChange}>
                 <option value="">Condición</option>
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
-              </select>
+              </select><br /><br />
 
-              <br /><br />
-
-              <input
-                type="number"
-                name="stock"
-                placeholder="Stock"
-                value={form.stock}
-                onChange={handleChange}
-              />
-
-              <br /><br />
-
-              <input
-                name="image"
-                placeholder="URL imagen"
-                value={form.image}
-                onChange={handleChange}
-              />
-
-              <br /><br />
+              <input type="number" name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} /><br /><br />
+              <input name="image" placeholder="URL imagen" value={form.image} onChange={handleChange} /><br /><br />
 
               <button style={{
                 background: "#C9A646",
                 color: "white",
-                border: "none",
-                padding: "12px 20px",
-                borderRadius: "8px",
-                cursor: "pointer"
+                padding: "10px 20px",
+                borderRadius: 6,
+                border: "none"
               }}>
                 Publicar
               </button>
 
             </form>
-
           </div>
         )
       }
 
-      {/* PRODUCTOS */}
+      {/* ================= PRODUCTOS ================= */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-        gap: "25px"
+        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+        gap: "20px"
       }}>
 
         {
           filteredProducts.map(product => (
 
-            <div
-              key={product.id}
-              style={{
-                background: "white",
-                borderRadius: "16px",
-                overflow: "hidden",
-                boxShadow: "0px 4px 15px rgba(0,0,0,0.08)"
-              }}
-            >
+            <div key={product.id} style={{
+              background: "white",
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.1)"
+            }}>
 
               {/* IMAGEN */}
               <img
-                src={
-                  product.image ||
-                  "https://via.placeholder.com/300x200"
-                }
+                src={product.image}
                 alt={product.title}
                 style={{
                   width: "100%",
-                  height: "220px",
+                  height: 180,
                   objectFit: "cover"
                 }}
               />
 
-              <div style={{ padding: "18px" }}>
+              <div style={{ padding: 15 }}>
+
+                <h3>{product.title}</h3>
 
                 {/* CONDICIÓN */}
                 <span style={{
-                  background:
-                    product.condition === "Nuevo"
-                      ? "#1E5A96"
-                      : "#777",
-
+                  background: product.condition === "Nuevo" ? "#1E5A96" : "#777",
                   color: "white",
-
-                  padding: "4px 10px",
-
-                  borderRadius: "6px",
-
-                  fontSize: "12px"
+                  padding: "4px 8px",
+                  borderRadius: 6,
+                  fontSize: 12
                 }}>
                   {product.condition}
                 </span>
 
-                <h3>{product.title}</h3>
-
-                <p style={{
-                  color: "#666"
-                }}>
+                <p style={{ fontSize: 14, color: "#555" }}>
                   {product.description}
                 </p>
 
-                <p>
-                  <strong>Stock:</strong> {product.stock}
-                </p>
+                <p><strong>Stock:</strong> {product.stock}</p>
 
-                <h2 style={{
-                  color: "#0B3C6D"
+                <p style={{
+                  color: "#0B3C6D",
+                  fontWeight: "bold",
+                  fontSize: 18
                 }}>
                   ${product.price}
-                </h2>
-
-                {/* VENDEDOR */}
-                <hr />
-
-                <p>
-                  👤 {
-                    product.sellerInfo?.publicName ||
-                    "Vendedor"
-                  }
                 </p>
+
+                {/* INFO VENDEDOR */}
+                <p>👤 {product.sellerInfo?.name}</p>
 
                 <p>
                   ⭐ {
                     product.sellerInfo?.rating === "Nuevo"
                       ? "Nuevo vendedor"
-                      : product.sellerInfo?.rating || "Nuevo vendedor"
+                      : product.sellerInfo?.rating
                   }
                 </p>
 
-                {/* PERFIL */}
+                {/* 🔥 BOTÓN PERFIL */}
                 <button
-                  onClick={() =>
-                    navigate(`/seller/${product.seller}`)
-                  }
+                  onClick={() => window.location.href = `/profile/${product.seller}`}
                   style={{
-                    width: "100%",
                     background: "#1E5A96",
                     color: "white",
-                    border: "none",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                    cursor: "pointer"
+                    padding: 6,
+                    borderRadius: 6,
+                    width: "100%",
+                    marginTop: 5,
+                    border: "none"
                   }}
                 >
                   Ver perfil
                 </button>
 
-                {/* CARRITO */}
+                {/* 🛒 */}
                 <button
-                  onClick={() =>
-                    handleAddToCart(product.id)
-                  }
+                  onClick={() => handleAddToCart(product.id)}
                   style={{
-                    width: "100%",
                     background: "#0B3C6D",
                     color: "white",
-                    border: "none",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    cursor: "pointer"
+                    padding: 8,
+                    borderRadius: 6,
+                    width: "100%",
+                    marginTop: 10,
+                    border: "none"
                   }}
                 >
-                  🛒 Agregar al carrito
+                  🛒 Agregar
                 </button>
 
                 {/* EDITAR / ELIMINAR */}
                 {
-                  (user?.id === product.seller ||
-                    user?.role === "admin") && (
-
+                  (user?.id === product.seller || user?.role === "admin") && (
                     <div style={{
                       display: "flex",
                       justifyContent: "space-between",
-                      marginTop: "15px"
+                      marginTop: 10
                     }}>
-
-                      <button
-                        onClick={() => handleEdit(product)}
-                      >
-                        ✏️
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        🗑️
-                      </button>
-
+                      <button onClick={() => handleEdit(product)}>✏️</button>
+                      <button onClick={() => handleDelete(product.id)}>🗑️</button>
                     </div>
                   )
                 }
