@@ -64,7 +64,6 @@ function Marketplace() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔥 VALIDACIÓN FRONTEND
     if (
       !form.title ||
       !form.price ||
@@ -115,7 +114,6 @@ function Marketplace() {
 
   const handleEdit = async (product) => {
 
-    // 🔥 EDICIÓN COMPLETA
     const newData = {
       title: prompt("Título", product.title),
       price: prompt("Precio", product.price),
@@ -127,12 +125,9 @@ function Marketplace() {
     };
 
     try {
-
       await updateProduct(product.id, newData);
-
       alert("Producto actualizado ✅");
       loadProducts();
-
     } catch (error) {
       console.error(error);
       alert("Error al editar");
@@ -142,9 +137,8 @@ function Marketplace() {
   const handleAddToCart = async (id) => {
     try {
       await addToCart(id);
-      alert("Producto agregado al carrito 🛒");
+      alert("Producto agregado 🛒");
     } catch (error) {
-      console.error(error);
       alert(error.response?.data?.error || "Error");
     }
   };
@@ -153,18 +147,22 @@ function Marketplace() {
   // UI
   // ===============================
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ background: "#f5f7fb", minHeight: "100vh", padding: "30px" }}>
 
-      <h1>Marketplace 🛒</h1>
+      <h1 style={{ color: "#002F6C" }}>Marketplace 🛒</h1>
 
-      <hr />
-
-      {/* FORM SOLO VENDEDORES */}
+      {/* ================= FORM ================= */}
       {
-        user?.isSeller ? (
+        user?.isSeller && (
+          <div style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 10,
+            marginBottom: 30,
+            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+          }}>
 
-          <>
-            <h2>Publicar producto</h2>
+            <h2 style={{ color: "#0056b3" }}>Publicar producto</h2>
 
             <form onSubmit={handleSubmit}>
 
@@ -200,59 +198,86 @@ function Marketplace() {
               <input name="image" placeholder="URL imagen" value={form.image} onChange={handleChange} />
               <br /><br />
 
-              <button type="submit">Publicar</button>
+              <button style={{
+                background: "#002F6C",
+                color: "white",
+                padding: "10px 20px",
+                border: "none",
+                borderRadius: 5
+              }}>
+                Publicar
+              </button>
 
             </form>
-          </>
-
-        ) : (
-          <h2>⚠️ Debes ser vendedor</h2>
+          </div>
         )
       }
 
-      <hr />
-
-      <h2>Productos</h2>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      {/* ================= PRODUCTOS ================= */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+        gap: "20px"
+      }}>
 
         {
           products.map(product => (
 
-            <div key={product.id} style={{ border: "1px solid gray", padding: 15, width: 300 }}>
+            <div key={product.id} style={{
+              background: "white",
+              borderRadius: 10,
+              padding: 15,
+              boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+            }}>
 
-              <img src={product.image} alt={product.title} width="250" />
+              <img
+                src={product.image}
+                alt={product.title}
+                style={{
+                  width: "100%",
+                  height: 150,
+                  objectFit: "cover",
+                  borderRadius: 8
+                }}
+              />
 
               <h3>{product.title}</h3>
               <p>{product.description}</p>
 
-              <p>Stock: {product.stock}</p>
-              <strong>${product.price}</strong>
+              <p><strong>Stock:</strong> {product.stock}</p>
+              <p style={{ color: "#0056b3", fontWeight: "bold" }}>
+                ${product.price}
+              </p>
 
-              {/* INFO VENDEDOR */}
-              <p>Vendedor: {product.sellerInfo?.name}</p>
+              <p>👤 {product.sellerInfo?.name}</p>
               <p>
-                Rating: {
+                ⭐ {
                   product.sellerInfo?.rating === "Nuevo"
                     ? "Nuevo vendedor"
-                    : product.sellerInfo?.rating + " ⭐"
+                    : product.sellerInfo?.rating
                 }
               </p>
-              <p>Contacto: {product.sellerInfo?.email}</p>
 
-              <br />
-
-              <button onClick={() => handleAddToCart(product.id)}>
-                🛒 Carrito
+              <button
+                onClick={() => handleAddToCart(product.id)}
+                style={{
+                  background: "#0056b3",
+                  color: "white",
+                  border: "none",
+                  padding: 8,
+                  borderRadius: 5,
+                  marginTop: 10
+                }}
+              >
+                🛒 Agregar
               </button>
 
-              {/* EDITAR / ELIMINAR */}
               {
                 (user?.id === product.seller || user?.role === "admin") && (
-                  <>
+                  <div style={{ marginTop: 10 }}>
                     <button onClick={() => handleEdit(product)}>✏️</button>
                     <button onClick={() => handleDelete(product.id)}>🗑️</button>
-                  </>
+                  </div>
                 )
               }
 

@@ -6,8 +6,8 @@ function Purchases() {
 
   const [purchases, setPurchases] = useState([]);
 
-  // 🔥 NUEVO (para comentario opcional)
-  const [comments, setComments] = useState({});
+  // ⭐ estado para rating y comentario
+  const [reviews, setReviews] = useState({});
 
   // ===============================
   // CARGAR COMPRAS
@@ -26,12 +26,15 @@ function Purchases() {
   }, []);
 
   // ===============================
-  // MANEJAR COMENTARIO
+  // MANEJAR INPUTS
   // ===============================
-  const handleCommentChange = (productId, value) => {
-    setComments(prev => ({
+  const handleChange = (productId, field, value) => {
+    setReviews(prev => ({
       ...prev,
-      [productId]: value
+      [productId]: {
+        ...prev[productId],
+        [field]: value
+      }
     }));
   };
 
@@ -40,23 +43,18 @@ function Purchases() {
   // ===============================
   const handleReview = async (p) => {
 
-    const rating = prompt("Calificación 1-5");
+    const review = reviews[p.productId];
 
-    if (!rating) return;
-
-    const numericRating = Number(rating);
-
-    // 🔥 VALIDACIÓN FUERTE
-    if (numericRating < 1 || numericRating > 5) {
-      return alert("La calificación debe ser entre 1 y 5");
+    if (!review || !review.rating) {
+      return alert("Selecciona una calificación");
     }
 
     try {
 
       await addReview({
         productId: p.productId,
-        rating: numericRating,
-        comment: comments[p.productId] || ""
+        rating: Number(review.rating),
+        comment: review.comment || ""
       });
 
       alert("Reseña enviada ⭐");
@@ -78,7 +76,7 @@ function Purchases() {
   // UI
   // ===============================
   return (
-    <div style={{ padding: 20 }}>
+    <div className="container">
 
       <h1>Mis Compras 🧾</h1>
 
@@ -86,59 +84,92 @@ function Purchases() {
         purchases.length === 0 ? (
           <p>No tienes compras aún</p>
         ) : (
-          purchases.map((p, index) => (
-            <div
-              key={index}
-              style={{
-                border: "1px solid gray",
-                margin: 10,
-                padding: 10,
-                borderRadius: 10
-              }}
-            >
+          <div className="grid">
 
-              {/* IMAGEN */}
-              {
-                p.image && (
-                  <img
-                    src={p.image}
-                    alt={p.title}
-                    width="120"
-                  />
-                )
-              }
+            {
+              purchases.map((p, index) => (
 
-              <h3>{p.title}</h3>
-              <p>Precio: ${p.price}</p>
+                <div key={index} className="card">
 
-              {/* 🔥 ESTADO */}
-              {
-                p.reviewed ? (
-                  <p>Ya calificado ✅</p>
-                ) : (
-                  <>
-                    <textarea
-                      placeholder="Comentario (opcional)"
-                      value={comments[p.productId] || ""}
-                      onChange={(e) =>
-                        handleCommentChange(
-                          p.productId,
-                          e.target.value
-                        )
-                      }
-                    />
+                  {/* IMAGEN */}
+                  {
+                    p.image && (
+                      <img
+                        src={p.image}
+                        alt={p.title}
+                        style={{
+                          width: "100%",
+                          borderRadius: 8,
+                          marginBottom: 10
+                        }}
+                      />
+                    )
+                  }
 
-                    <br /><br />
+                  <h3>{p.title}</h3>
 
-                    <button onClick={() => handleReview(p)}>
-                      Calificar ⭐
-                    </button>
-                  </>
-                )
-              }
+                  <p><strong>Precio:</strong> ${p.price}</p>
 
-            </div>
-          ))
+                  {/* ESTADO */}
+                  {
+                    p.reviewed ? (
+                      <p style={{ color: "green" }}>
+                        ✅ Ya calificaste
+                      </p>
+                    ) : (
+                      <>
+                        {/* ⭐ RATING */}
+                        <select
+                          value={reviews[p.productId]?.rating || ""}
+                          onChange={(e) =>
+                            handleChange(
+                              p.productId,
+                              "rating",
+                              e.target.value
+                            )
+                          }
+                        >
+                          <option value="">Calificación</option>
+                          <option value="5">5 ⭐</option>
+                          <option value="4">4 ⭐</option>
+                          <option value="3">3 ⭐</option>
+                          <option value="2">2 ⭐</option>
+                          <option value="1">1 ⭐</option>
+                        </select>
+
+                        <br /><br />
+
+                        {/* 💬 COMENTARIO */}
+                        <textarea
+                          placeholder="Comentario (opcional)"
+                          value={reviews[p.productId]?.comment || ""}
+                          onChange={(e) =>
+                            handleChange(
+                              p.productId,
+                              "comment",
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        <br /><br />
+
+                        <button
+                          className="btn"
+                          onClick={() => handleReview(p)}
+                        >
+                          Enviar reseña ⭐
+                        </button>
+                      </>
+                    )
+                  }
+
+                </div>
+
+              ))
+            }
+
+          </div>
         )
       }
 

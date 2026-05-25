@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
 
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
 
   const logout = () => {
@@ -12,50 +11,55 @@ function Navbar() {
   };
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        gap: "20px",
-        padding: "20px",
-        borderBottom: "1px solid gray",
-        alignItems: "center"
-      }}
-    >
+    <nav className="navbar">
 
-      {/* HOME */}
-      <Link to="/">Home</Link>
+      {/* LOGO / NOMBRE */}
+      <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+        Marketplace Sabana
+      </div>
 
-      {/* USUARIO LOGEADO */}
+      {/* LINKS */}
+      <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+
+        <Link to="/">Home</Link>
+
+        {
+          token && (
+            <>
+              <Link to="/marketplace">Marketplace</Link>
+              <Link to="/profile">Perfil</Link>
+              <Link to="/cart">Carrito</Link>
+              <Link to="/purchases">Compras</Link>
+            </>
+          )
+        }
+
+        {
+          !token && (
+            <>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
+            </>
+          )
+        }
+
+      </div>
+
+      {/* BOTÓN LOGOUT */}
       {
         token && (
-          <>
-            <Link to="/marketplace">Marketplace</Link>
-
-            <Link to="/profile">Perfil</Link>
-
-            <Link to="/cart">Carrito</Link>
-
-            {/* 🔥 NUEVO */}
-            <Link to="/purchases">Compras</Link>
-          </>
-        )
-      }
-
-      {/* USUARIO NO LOGEADO */}
-      {
-        !token && (
-          <>
-            <Link to="/login">Login</Link>
-
-            <Link to="/register">Register</Link>
-          </>
-        )
-      }
-
-      {/* LOGOUT */}
-      {
-        token && (
-          <button onClick={logout}>
+          <button
+            onClick={logout}
+            style={{
+              background: "white",
+              color: "#003366",
+              border: "none",
+              padding: "6px 12px",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontWeight: "bold"
+            }}
+          >
             Logout
           </button>
         )
