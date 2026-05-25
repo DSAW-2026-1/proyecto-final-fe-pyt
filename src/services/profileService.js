@@ -4,38 +4,64 @@ const API = "https://proyecto-final-be-pyt.onrender.com/api/profile";
 
 const getToken = () => {
   const token = localStorage.getItem("token");
-
-  console.log("TOKEN EN PROFILE:", token); // 👈 DEBUG
-
+  console.log("TOKEN EN PROFILE:", token);
   return token;
 };
 
-// obtener perfil
+// ===============================
+// 👤 OBTENER PERFIL
+// ===============================
 export const getProfile = async () => {
 
-  const response = await axios.get(API, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  });
+  try {
 
-  return response.data;
-
-};
-
-// convertirse en vendedor
-export const becomeSeller = async (sellerData) => {
-
-  const response = await axios.post(
-    `${API}/become-seller`,
-    sellerData,
-    {
+    const response = await axios.get(API, {
       headers: {
         Authorization: `Bearer ${getToken()}`
       }
-    }
-  );
+    });
 
-  return response.data;
+    return response.data;
+
+  } catch (error) {
+
+    console.error(
+      "ERROR PROFILE:",
+      error.response?.data || error.message
+    );
+
+    return null; // 🔥 evita que la app se rompa
+  }
+
+};
+
+// ===============================
+// 🛍️ CONVERTIRSE EN VENDEDOR
+// ===============================
+export const becomeSeller = async (sellerData) => {
+
+  try {
+
+    const response = await axios.post(
+      `${API}/become-seller`,
+      sellerData,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      }
+    );
+
+    return response.data;
+
+  } catch (error) {
+
+    console.error(
+      "ERROR BECOME SELLER:",
+      error.response?.data || error.message
+    );
+
+    throw error; // 🔥 aquí sí lo lanzamos para mostrar alert en UI
+  }
 
 };

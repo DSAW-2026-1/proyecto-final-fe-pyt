@@ -6,14 +6,10 @@ import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
+import Purchases from "./pages/Purchases"; // ✅ IMPORTADO BIEN
 
 import Navbar from "./components/Navbar";
-
 import PrivateRoute from "./routes/PrivateRoute";
-
-import Purchases from "./pages/Purchases";
-
-<Route path="/purchases" element={<Purchases />} />
 
 function App() {
   return (
@@ -24,7 +20,7 @@ function App() {
 
       <Routes>
 
-        {/* Home protegida */}
+        {/* Home */}
         <Route
           path="/"
           element={
@@ -34,7 +30,7 @@ function App() {
           }
         />
 
-        {/* Marketplace protegido */}
+        {/* Marketplace */}
         <Route
           path="/marketplace"
           element={
@@ -44,19 +40,23 @@ function App() {
           }
         />
 
-        {/* Login */}
+        {/* Purchases (🔥 AQUÍ VA, NO AFUERA) */}
         <Route
-          path="/login"
-          element={<Login />}
+          path="/purchases"
+          element={
+            <PrivateRoute>
+              <Purchases />
+            </PrivateRoute>
+          }
         />
+
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
 
         {/* Register */}
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+        <Route path="/register" element={<Register />} />
 
-        {/* Profile protegido */}
+        {/* Profile */}
         <Route
           path="/profile"
           element={
@@ -66,7 +66,7 @@ function App() {
           }
         />
 
-        {/* Cart protegido */}
+        {/* Cart */}
         <Route
           path="/cart"
           element={
