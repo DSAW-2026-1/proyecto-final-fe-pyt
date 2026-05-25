@@ -15,6 +15,8 @@ function Marketplace() {
   const [products, setProducts] = useState([]);
   const [user, setUser] = useState(null);
 
+  const [search, setSearch] = useState("");
+
   const [form, setForm] = useState({
     title: "",
     price: "",
@@ -50,6 +52,13 @@ function Marketplace() {
     loadProducts();
     loadUser();
   }, []);
+
+  // ===============================
+  // BUSCADOR
+  // ===============================
+  const filteredProducts = products.filter(p =>
+    p.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   // ===============================
   // FORM PRODUCTO
@@ -97,13 +106,12 @@ function Marketplace() {
       loadProducts();
 
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.error || "Error al publicar producto");
+      alert(error.response?.data?.error || "Error al publicar");
     }
   };
 
   // ===============================
-  // PRODUCTOS
+  // ACCIONES PRODUCTO
   // ===============================
   const handleDelete = async (id) => {
     try {
@@ -111,7 +119,6 @@ function Marketplace() {
       alert("Producto eliminado ✅");
       loadProducts();
     } catch (error) {
-      console.error(error);
       alert(error.response?.data?.error || "Error al eliminar");
     }
   };
@@ -129,7 +136,7 @@ function Marketplace() {
     };
 
     if (Object.values(newData).some(v => v === null)) {
-      return alert("Edición cancelada");
+      return;
     }
 
     try {
@@ -143,7 +150,6 @@ function Marketplace() {
       loadProducts();
 
     } catch (error) {
-      console.error(error);
       alert(error.response?.data?.error || "Error al editar");
     }
   };
@@ -167,9 +173,28 @@ function Marketplace() {
       padding: "30px"
     }}>
 
-      <h1 style={{ color: "#0B3C6D" }}>
-        Marketplace 🛒
+      {/* HEADER */}
+      <h1 style={{
+        color: "#0B3C6D",
+        marginBottom: 20
+      }}>
+        Mercado Sabana 🛒
       </h1>
+
+      {/* BUSCADOR */}
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 10,
+          marginBottom: 30,
+          borderRadius: 8,
+          border: "1px solid #ccc"
+        }}
+      />
 
       {/* ================= FORM ================= */}
       {
@@ -188,43 +213,32 @@ function Marketplace() {
 
             <form onSubmit={handleSubmit}>
 
-              <input name="title" placeholder="Título" value={form.title} onChange={handleChange} />
-              <br /><br />
-
-              <input type="number" name="price" placeholder="Precio" value={form.price} onChange={handleChange} />
-              <br /><br />
-
-              <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} />
-              <br /><br />
+              <input name="title" placeholder="Título" value={form.title} onChange={handleChange} /><br /><br />
+              <input type="number" name="price" placeholder="Precio" value={form.price} onChange={handleChange} /><br /><br />
+              <textarea name="description" placeholder="Descripción" value={form.description} onChange={handleChange} /><br /><br />
 
               <select name="category" value={form.category} onChange={handleChange}>
                 <option value="">Categoría</option>
                 <option value="Tecnología">Tecnología</option>
                 <option value="Libros">Libros</option>
                 <option value="Ropa">Ropa</option>
-              </select>
-
-              <br /><br />
+              </select><br /><br />
 
               <select name="condition" value={form.condition} onChange={handleChange}>
                 <option value="">Condición</option>
                 <option value="Nuevo">Nuevo</option>
                 <option value="Usado">Usado</option>
-              </select>
+              </select><br /><br />
 
-              <br /><br />
-
-              <input type="number" name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} />
-              <br /><br />
-
-              <input name="image" placeholder="URL imagen" value={form.image} onChange={handleChange} />
-              <br /><br />
+              <input type="number" name="stock" placeholder="Stock" value={form.stock} onChange={handleChange} /><br /><br />
+              <input name="image" placeholder="URL imagen" value={form.image} onChange={handleChange} /><br /><br />
 
               <button style={{
                 background: "#C9A646",
                 color: "white",
                 padding: "10px 20px",
-                borderRadius: 6
+                borderRadius: 6,
+                border: "none"
               }}>
                 Publicar
               </button>
@@ -242,14 +256,13 @@ function Marketplace() {
       }}>
 
         {
-          products.map(product => (
+          filteredProducts.map(product => (
 
             <div key={product.id} style={{
               background: "white",
               borderRadius: 12,
               overflow: "hidden",
-              boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
-              transition: "0.2s"
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.1)"
             }}>
 
               {/* IMAGEN */}
@@ -263,37 +276,36 @@ function Marketplace() {
                 }}
               />
 
-              {/* CONTENIDO */}
               <div style={{ padding: 15 }}>
 
                 <h3>{product.title}</h3>
 
-                {/* 🔥 CONDICIÓN */}
+                {/* CONDICIÓN */}
                 <span style={{
-                  background: product.condition === "Nuevo" ? "#1E5A96" : "#888",
+                  background: product.condition === "Nuevo" ? "#1E5A96" : "#777",
                   color: "white",
                   padding: "4px 8px",
-                  borderRadius: "6px",
+                  borderRadius: 6,
                   fontSize: 12
                 }}>
                   {product.condition}
                 </span>
 
-                <p style={{ color: "gray", fontSize: 14 }}>
+                <p style={{ fontSize: 14, color: "#555" }}>
                   {product.description}
                 </p>
 
                 <p><strong>Stock:</strong> {product.stock}</p>
 
                 <p style={{
-                  color: "#1E5A96",
+                  color: "#0B3C6D",
                   fontWeight: "bold",
                   fontSize: 18
                 }}>
                   ${product.price}
                 </p>
 
-                {/* VENDEDOR */}
+                {/* INFO VENDEDOR */}
                 <p>👤 {product.sellerInfo?.name}</p>
 
                 <p>
@@ -304,7 +316,23 @@ function Marketplace() {
                   }
                 </p>
 
-                {/* BOTÓN */}
+                {/* 🔥 BOTÓN PERFIL */}
+                <button
+                  onClick={() => window.location.href = `/profile/${product.seller}`}
+                  style={{
+                    background: "#1E5A96",
+                    color: "white",
+                    padding: 6,
+                    borderRadius: 6,
+                    width: "100%",
+                    marginTop: 5,
+                    border: "none"
+                  }}
+                >
+                  Ver perfil
+                </button>
+
+                {/* 🛒 */}
                 <button
                   onClick={() => handleAddToCart(product.id)}
                   style={{
@@ -313,7 +341,8 @@ function Marketplace() {
                     padding: 8,
                     borderRadius: 6,
                     width: "100%",
-                    marginTop: 10
+                    marginTop: 10,
+                    border: "none"
                   }}
                 >
                   🛒 Agregar

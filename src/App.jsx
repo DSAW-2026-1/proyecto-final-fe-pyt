@@ -6,7 +6,9 @@ import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
-import Purchases from "./pages/Purchases"; // ✅ IMPORTADO BIEN
+import Purchases from "./pages/Purchases";
+import PublicProfile from "./pages/PublicProfile"; // ✅ NUEVO
+import Chat from "./pages/Chat"; // ✅ NUEVO
 
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -15,12 +17,14 @@ function App() {
   return (
     <BrowserRouter>
 
-      {/* Navbar */}
-      <Navbar />
+      {/* Navbar solo cuando hay sesión */}
+      {
+        localStorage.getItem("token") && <Navbar />
+      }
 
       <Routes>
 
-        {/* Home */}
+        {/* HOME */}
         <Route
           path="/"
           element={
@@ -30,7 +34,7 @@ function App() {
           }
         />
 
-        {/* Marketplace */}
+        {/* MARKETPLACE */}
         <Route
           path="/marketplace"
           element={
@@ -40,7 +44,7 @@ function App() {
           }
         />
 
-        {/* Purchases (🔥 AQUÍ VA, NO AFUERA) */}
+        {/* COMPRAS */}
         <Route
           path="/purchases"
           element={
@@ -50,13 +54,7 @@ function App() {
           }
         />
 
-        {/* Login */}
-        <Route path="/login" element={<Login />} />
-
-        {/* Register */}
-        <Route path="/register" element={<Register />} />
-
-        {/* Profile */}
+        {/* PERFIL PRIVADO */}
         <Route
           path="/profile"
           element={
@@ -66,7 +64,13 @@ function App() {
           }
         />
 
-        {/* Cart */}
+        {/* PERFIL PÚBLICO (🔥 NUEVO) */}
+        <Route
+          path="/seller/:id"
+          element={<PublicProfile />}
+        />
+
+        {/* CARRITO */}
         <Route
           path="/cart"
           element={
@@ -75,6 +79,22 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        {/* CHAT (🔥 NUEVO) */}
+        <Route
+          path="/chat/:id"
+          element={
+            <PrivateRoute>
+              <Chat />
+            </PrivateRoute>
+          }
+        />
+
+        {/* LOGIN */}
+        <Route path="/login" element={<Login />} />
+
+        {/* REGISTER */}
+        <Route path="/register" element={<Register />} />
 
       </Routes>
 

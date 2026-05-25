@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import {
   getProfile,
   becomeSeller
@@ -16,85 +15,129 @@ function Profile() {
     description: ""
   });
 
-  // cargar perfil
+  const [loading, setLoading] = useState(true);
+
+  // ===============================
+  // CARGAR PERFIL
+  // ===============================
   const loadProfile = async () => {
-
-    const data = await getProfile();
-
-    setUser(data);
-
+    try {
+      const data = await getProfile();
+      setUser(data);
+    } catch (error) {
+      console.error("Error cargando perfil", error);
+      alert("Error cargando perfil");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     loadProfile();
   }, []);
 
-  // manejar inputs
+  // ===============================
+  // INPUTS
+  // ===============================
   const handleChange = (e) => {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
-
   };
 
-  // hacerse vendedor
+  // ===============================
+  // SER VENDEDOR
+  // ===============================
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    await becomeSeller(form);
+    try {
 
-    alert("Ahora eres vendedor ✅");
+      await becomeSeller(form);
 
-    loadProfile();
+      alert("Ahora eres vendedor ✅");
+
+      loadProfile();
+
+    } catch (error) {
+      console.error(error);
+      alert("Error al convertirse en vendedor");
+    }
 
   };
 
-  if (!user) {
-    return <h1>Cargando...</h1>;
+  // ===============================
+  // LOADING
+  // ===============================
+  if (loading) {
+    return <h1 style={{ textAlign: "center" }}>Cargando...</h1>;
   }
 
+  if (!user) {
+    return <h1>Error cargando usuario</h1>;
+  }
+
+  // ===============================
+  // UI
+  // ===============================
   return (
-    <div>
+    <div className="container">
 
-      <h1>Mi Perfil 👤</h1>
+      <h1 style={{ color: "#0B3C6D" }}>
+        Mi Perfil 👤
+      </h1>
 
-      <hr />
+      <div className="card" style={{ padding: 20 }}>
 
-      <p>
-        <strong>Nombre:</strong> {user.name}
-      </p>
+        <p><strong>Nombre:</strong> {user.name}</p>
+        <p><strong>Correo:</strong> {user.email}</p>
+        <p><strong>Rol:</strong> {user.role}</p>
 
-      <p>
-        <strong>Correo:</strong> {user.email}
-      </p>
+        <p><strong>Ventas:</strong> {user.totalSales}</p>
 
-      <p>
-        <strong>Rol:</strong> {user.role}
-      </p>
+        <p>
+          <strong>Calificación:</strong>{" "}
+          {
+            user.rating
+              ? `⭐ ${user.rating}`
+              : "Nuevo vendedor"
+          }
+        </p>
 
-      <p>
-        <strong>Ventas:</strong> {user.totalSales}
-      </p>
+      </div>
 
-      <p>
-        <strong>Calificación:</strong>
+      <br />
+
+      {/* ===============================
+          NOTIFICACIONES
+      =============================== */}
+      <div className="card" style={{ padding: 20 }}>
+
+        <h3>🔔 Notificaciones</h3>
 
         {
-          user.rating
-            ? ` ⭐ ${user.rating}`
-            : " Nuevo vendedor"
+          user.notifications && user.notifications.length > 0
+            ? user.notifications.map((n, i) => (
+              <p key={i}>
+                {n.message}
+              </p>
+            ))
+            : <p>No tienes notificaciones</p>
         }
-      </p>
 
-      <hr />
+      </div>
 
+      <br />
+
+      {/* ===============================
+          FORM VENDEDOR
+      =============================== */}
       {
-        !user.isSeller && (
+        !user.isSeller ? (
 
-          <div>
+          <div className="card" style={{ padding: 20 }}>
 
             <h2>Convertirme en vendedor 🏪</h2>
 
@@ -104,6 +147,7 @@ function Profile() {
                 type="text"
                 name="publicName"
                 placeholder="Nombre público"
+                value={form.publicName}
                 onChange={handleChange}
               />
 
@@ -113,6 +157,7 @@ function Profile() {
                 type="text"
                 name="phone"
                 placeholder="Teléfono"
+                value={form.phone}
                 onChange={handleChange}
               />
 
@@ -122,6 +167,7 @@ function Profile() {
                 type="text"
                 name="faculty"
                 placeholder="Facultad"
+                value={form.faculty}
                 onChange={handleChange}
               />
 
@@ -130,12 +176,13 @@ function Profile() {
               <textarea
                 name="description"
                 placeholder="Descripción"
+                value={form.description}
                 onChange={handleChange}
               />
 
               <br /><br />
 
-              <button type="submit">
+              <button className="btn-gold">
                 Ser vendedor
               </button>
 
@@ -143,14 +190,21 @@ function Profile() {
 
           </div>
 
-        )
-      }
+        ) : (
 
-      {
-        user.isSeller && (
-          <h2>
-            🏪 Eres vendedor
-          </h2>
+          <div className="card" style={{ padding: 20 }}>
+
+            <h2 style={{ color: "#0B3C6D" }}>
+              🏪 Ya eres vendedor
+            </h2>
+
+            <p><strong>Nombre público:</strong> {user.sellerInfo?.publicName}</p>
+            <p><strong>Teléfono:</strong> {user.sellerInfo?.phone}</p>
+            <p><strong>Facultad:</strong> {user.sellerInfo?.faculty}</p>
+            <p><strong>Descripción:</strong> {user.sellerInfo?.description}</p>
+
+          </div>
+
         )
       }
 
