@@ -3,68 +3,98 @@ import axios from "axios";
 const API = "https://proyecto-final-be-pyt.onrender.com/api/cart";
 
 const getToken = () => {
-  return localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    console.warn("⚠️ No hay token guardado");
+  }
+
+  return token;
 };
 
-// ver carrito
+// =======================
+// VER CARRITO
+// =======================
 export const getCart = async () => {
+  try {
+    const response = await axios.get(API, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
 
-  const response = await axios.get(API, {
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  });
+    return response.data;
 
-  return response.data;
-
+  } catch (error) {
+    console.error("❌ ERROR GET CART:", error.response?.data || error);
+    throw error;
+  }
 };
 
-// agregar
+// =======================
+// AGREGAR PRODUCTO
+// =======================
 export const addToCart = async (productId) => {
-
-  const response = await axios.post(
-    API,
-    { productId },
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
+  try {
+    const response = await axios.post(
+      `${API}/add`, // 🔥 CORREGIDO AQUÍ
+      { productId },
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
       }
-    }
-  );
+    );
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("❌ ERROR ADD CART:", error.response?.data || error);
+    throw error;
+  }
 };
 
-// eliminar
+// =======================
+// ELIMINAR DEL CARRITO
+// =======================
 export const removeFromCart = async (id) => {
-
-  const response = await axios.delete(
-    `${API}/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
+  try {
+    const response = await axios.delete(
+      `${API}/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
       }
-    }
-  );
+    );
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("❌ ERROR REMOVE CART:", error.response?.data || error);
+    throw error;
+  }
 };
 
-// comprar
+// =======================
+// CHECKOUT
+// =======================
 export const checkout = async () => {
-
-  const response = await axios.post(
-    `${API}/checkout`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
+  try {
+    const response = await axios.post(
+      `${API}/checkout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
       }
-    }
-  );
+    );
 
-  return response.data;
+    return response.data;
 
+  } catch (error) {
+    console.error("❌ ERROR CHECKOUT:", error.response?.data || error);
+    throw error;
+  }
 };

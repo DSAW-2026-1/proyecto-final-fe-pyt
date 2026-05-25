@@ -76,7 +76,11 @@ function Marketplace() {
     }
 
     try {
-      await createProduct(form);
+      await createProduct({
+        ...form,
+        price: Number(form.price),
+        stock: Number(form.stock)
+      });
 
       alert("Producto publicado ✅");
 
@@ -94,7 +98,7 @@ function Marketplace() {
 
     } catch (error) {
       console.error(error);
-      alert("Error al publicar producto");
+      alert(error.response?.data?.error || "Error al publicar producto");
     }
   };
 
@@ -119,20 +123,25 @@ function Marketplace() {
       price: prompt("Precio", product.price),
       description: prompt("Descripción", product.description),
       category: prompt("Categoría", product.category),
-      condition: prompt("Condición", product.condition),
+      condition: prompt("Condición (Nuevo/Usado)", product.condition),
       stock: prompt("Stock", product.stock),
       image: prompt("Imagen URL", product.image)
     };
 
-    // ❌ si cancela algún campo
     if (Object.values(newData).some(v => v === null)) {
       return alert("Edición cancelada");
     }
 
     try {
-      await updateProduct(product.id, newData);
+      await updateProduct(product.id, {
+        ...newData,
+        price: Number(newData.price),
+        stock: Number(newData.stock)
+      });
+
       alert("Producto actualizado ✅");
       loadProducts();
+
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.error || "Error al editar");
@@ -144,7 +153,7 @@ function Marketplace() {
       await addToCart(id);
       alert("Producto agregado 🛒");
     } catch (error) {
-      alert(error.response?.data?.error || "Error");
+      alert(error.response?.data?.error || "Error al agregar");
     }
   };
 
@@ -158,11 +167,7 @@ function Marketplace() {
       padding: "30px"
     }}>
 
-      {/* HEADER */}
-      <h1 style={{
-        color: "#0B3C6D",
-        marginBottom: 20
-      }}>
+      <h1 style={{ color: "#0B3C6D" }}>
         Marketplace 🛒
       </h1>
 
@@ -263,6 +268,17 @@ function Marketplace() {
 
                 <h3>{product.title}</h3>
 
+                {/* 🔥 CONDICIÓN */}
+                <span style={{
+                  background: product.condition === "Nuevo" ? "#1E5A96" : "#888",
+                  color: "white",
+                  padding: "4px 8px",
+                  borderRadius: "6px",
+                  fontSize: 12
+                }}>
+                  {product.condition}
+                </span>
+
                 <p style={{ color: "gray", fontSize: 14 }}>
                   {product.description}
                 </p>
@@ -288,7 +304,7 @@ function Marketplace() {
                   }
                 </p>
 
-                {/* BOTÓN CARRITO */}
+                {/* BOTÓN */}
                 <button
                   onClick={() => handleAddToCart(product.id)}
                   style={{
