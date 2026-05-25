@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile";
 import Cart from "./pages/Cart";
 import Purchases from "./pages/Purchases";
 
@@ -43,7 +44,7 @@ function App() {
           }
         />
 
-        {/* PROFILE */}
+        {/* PERFIL PRIVADO */}
         <Route
           path="/profile"
           element={
@@ -53,7 +54,17 @@ function App() {
           }
         />
 
-        {/* CART */}
+        {/* 🔥 PERFIL PUBLICO VENDEDOR */}
+        <Route
+          path="/seller/:id"
+          element={
+            <PrivateRoute>
+              <PublicProfile />
+            </PrivateRoute>
+          }
+        />
+
+        {/* CARRITO */}
         <Route
           path="/cart"
           element={
