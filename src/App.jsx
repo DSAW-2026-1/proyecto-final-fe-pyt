@@ -7,20 +7,19 @@ import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
 import Cart from "./pages/Cart";
 import Purchases from "./pages/Purchases";
-import PublicProfile from "./pages/PublicProfile"; // ✅ NUEVO
-import Chat from "./pages/Chat"; // ✅ NUEVO
 
 import Navbar from "./components/Navbar";
+
 import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
-      {/* Navbar solo cuando hay sesión */}
-      {
-        localStorage.getItem("token") && <Navbar />
-      }
+      {/* 🔥 NAVBAR */}
+      <Navbar />
 
       <Routes>
 
@@ -44,6 +43,26 @@ function App() {
           }
         />
 
+        {/* PROFILE */}
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+
+        {/* CART */}
+        <Route
+          path="/cart"
+          element={
+            <PrivateRoute>
+              <Cart />
+            </PrivateRoute>
+          }
+        />
+
         {/* COMPRAS */}
         <Route
           path="/purchases"
@@ -54,52 +73,24 @@ function App() {
           }
         />
 
-        {/* PERFIL PRIVADO */}
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-
-        {/* PERFIL PÚBLICO (🔥 NUEVO) */}
-        <Route
-          path="/seller/:id"
-          element={<PublicProfile />}
-        />
-
-        {/* CARRITO */}
-        <Route
-          path="/cart"
-          element={
-            <PrivateRoute>
-              <Cart />
-            </PrivateRoute>
-          }
-        />
-
-        {/* CHAT (🔥 NUEVO) */}
-        <Route
-          path="/chat/:id"
-          element={
-            <PrivateRoute>
-              <Chat />
-            </PrivateRoute>
-          }
-        />
-
         {/* LOGIN */}
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
         {/* REGISTER */}
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }
 
 export default App;
