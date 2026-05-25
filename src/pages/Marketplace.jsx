@@ -108,7 +108,7 @@ function Marketplace() {
       loadProducts();
     } catch (error) {
       console.error(error);
-      alert("Error al eliminar");
+      alert(error.response?.data?.error || "Error al eliminar");
     }
   };
 
@@ -124,13 +124,18 @@ function Marketplace() {
       image: prompt("Imagen URL", product.image)
     };
 
+    // ❌ si cancela algún campo
+    if (Object.values(newData).some(v => v === null)) {
+      return alert("Edición cancelada");
+    }
+
     try {
       await updateProduct(product.id, newData);
       alert("Producto actualizado ✅");
       loadProducts();
     } catch (error) {
       console.error(error);
-      alert("Error al editar");
+      alert(error.response?.data?.error || "Error al editar");
     }
   };
 
@@ -147,9 +152,19 @@ function Marketplace() {
   // UI
   // ===============================
   return (
-    <div style={{ background: "#f5f7fb", minHeight: "100vh", padding: "30px" }}>
+    <div style={{
+      background: "#F5F5F5",
+      minHeight: "100vh",
+      padding: "30px"
+    }}>
 
-      <h1 style={{ color: "#002F6C" }}>Marketplace 🛒</h1>
+      {/* HEADER */}
+      <h1 style={{
+        color: "#0B3C6D",
+        marginBottom: 20
+      }}>
+        Marketplace 🛒
+      </h1>
 
       {/* ================= FORM ================= */}
       {
@@ -157,12 +172,14 @@ function Marketplace() {
           <div style={{
             background: "white",
             padding: 20,
-            borderRadius: 10,
+            borderRadius: 12,
             marginBottom: 30,
-            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+            boxShadow: "0px 4px 12px rgba(0,0,0,0.1)"
           }}>
 
-            <h2 style={{ color: "#0056b3" }}>Publicar producto</h2>
+            <h2 style={{ color: "#1E5A96" }}>
+              Publicar producto
+            </h2>
 
             <form onSubmit={handleSubmit}>
 
@@ -199,11 +216,10 @@ function Marketplace() {
               <br /><br />
 
               <button style={{
-                background: "#002F6C",
+                background: "#C9A646",
                 color: "white",
                 padding: "10px 20px",
-                border: "none",
-                borderRadius: 5
+                borderRadius: 6
               }}>
                 Publicar
               </button>
@@ -216,7 +232,7 @@ function Marketplace() {
       {/* ================= PRODUCTOS ================= */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
         gap: "20px"
       }}>
 
@@ -225,61 +241,83 @@ function Marketplace() {
 
             <div key={product.id} style={{
               background: "white",
-              borderRadius: 10,
-              padding: 15,
-              boxShadow: "0px 2px 10px rgba(0,0,0,0.1)"
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+              transition: "0.2s"
             }}>
 
+              {/* IMAGEN */}
               <img
                 src={product.image}
                 alt={product.title}
                 style={{
                   width: "100%",
-                  height: 150,
-                  objectFit: "cover",
-                  borderRadius: 8
+                  height: 180,
+                  objectFit: "cover"
                 }}
               />
 
-              <h3>{product.title}</h3>
-              <p>{product.description}</p>
+              {/* CONTENIDO */}
+              <div style={{ padding: 15 }}>
 
-              <p><strong>Stock:</strong> {product.stock}</p>
-              <p style={{ color: "#0056b3", fontWeight: "bold" }}>
-                ${product.price}
-              </p>
+                <h3>{product.title}</h3>
 
-              <p>👤 {product.sellerInfo?.name}</p>
-              <p>
-                ⭐ {
-                  product.sellerInfo?.rating === "Nuevo"
-                    ? "Nuevo vendedor"
-                    : product.sellerInfo?.rating
+                <p style={{ color: "gray", fontSize: 14 }}>
+                  {product.description}
+                </p>
+
+                <p><strong>Stock:</strong> {product.stock}</p>
+
+                <p style={{
+                  color: "#1E5A96",
+                  fontWeight: "bold",
+                  fontSize: 18
+                }}>
+                  ${product.price}
+                </p>
+
+                {/* VENDEDOR */}
+                <p>👤 {product.sellerInfo?.name}</p>
+
+                <p>
+                  ⭐ {
+                    product.sellerInfo?.rating === "Nuevo"
+                      ? "Nuevo vendedor"
+                      : product.sellerInfo?.rating
+                  }
+                </p>
+
+                {/* BOTÓN CARRITO */}
+                <button
+                  onClick={() => handleAddToCart(product.id)}
+                  style={{
+                    background: "#0B3C6D",
+                    color: "white",
+                    padding: 8,
+                    borderRadius: 6,
+                    width: "100%",
+                    marginTop: 10
+                  }}
+                >
+                  🛒 Agregar
+                </button>
+
+                {/* EDITAR / ELIMINAR */}
+                {
+                  (user?.id === product.seller || user?.role === "admin") && (
+                    <div style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: 10
+                    }}>
+                      <button onClick={() => handleEdit(product)}>✏️</button>
+                      <button onClick={() => handleDelete(product.id)}>🗑️</button>
+                    </div>
+                  )
                 }
-              </p>
 
-              <button
-                onClick={() => handleAddToCart(product.id)}
-                style={{
-                  background: "#0056b3",
-                  color: "white",
-                  border: "none",
-                  padding: 8,
-                  borderRadius: 5,
-                  marginTop: 10
-                }}
-              >
-                🛒 Agregar
-              </button>
-
-              {
-                (user?.id === product.seller || user?.role === "admin") && (
-                  <div style={{ marginTop: 10 }}>
-                    <button onClick={() => handleEdit(product)}>✏️</button>
-                    <button onClick={() => handleDelete(product.id)}>🗑️</button>
-                  </div>
-                )
-              }
+              </div>
 
             </div>
 

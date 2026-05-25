@@ -11,59 +11,111 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
+    <nav style={{
+      background: "#0B3C6D",
+      color: "white",
+      padding: "10px 20px"
+    }}>
 
-      {/* LOGO / NOMBRE */}
-      <div style={{ fontWeight: "bold", fontSize: "18px" }}>
-        Marketplace Sabana
-      </div>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        maxWidth: "1200px",
+        margin: "auto"
+      }}>
 
-      {/* LINKS */}
-      <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+        {/* LOGO */}
+        <div style={{
+          fontWeight: "bold",
+          fontSize: "20px"
+        }}>
+          Mercado Sabana
+        </div>
 
-        <Link to="/">Home</Link>
-
+        {/* BUSCADOR */}
         {
           token && (
-            <>
-              <Link to="/marketplace">Marketplace</Link>
-              <Link to="/profile">Perfil</Link>
-              <Link to="/cart">Carrito</Link>
-              <Link to="/purchases">Compras</Link>
-            </>
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              style={{
+                width: "300px",
+                padding: "6px 10px",
+                borderRadius: "6px",
+                border: "none",
+                outline: "none"
+              }}
+            />
           )
         }
 
-        {
-          !token && (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-            </>
-          )
-        }
+        {/* LINKS */}
+        <div style={{
+          display: "flex",
+          gap: "15px",
+          alignItems: "center"
+        }}>
+
+          <Link to="/" style={{ color: "white", textDecoration: "none" }}>
+            Home
+          </Link>
+
+          {
+            token && (
+              <>
+                <Link to="/marketplace" style={{ color: "white", textDecoration: "none" }}>
+                  Marketplace
+                </Link>
+
+                <Link to="/cart" style={{ color: "white", textDecoration: "none" }}>
+                  🛒
+                </Link>
+
+                <Link to="/purchases" style={{ color: "white", textDecoration: "none" }}>
+                  Compras
+                </Link>
+
+                <Link to="/profile" style={{ color: "white", textDecoration: "none" }}>
+                  Perfil
+                </Link>
+
+                {/* LOGOUT */}
+                <button
+                  onClick={logout}
+                  style={{
+                    background: "#C9A646",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Logout
+                </button>
+              </>
+            )
+          }
+
+          {
+            !token && (
+              <>
+                <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
+                  Login
+                </Link>
+
+                <Link to="/register" style={{ color: "white", textDecoration: "none" }}>
+                  Register
+                </Link>
+              </>
+            )
+          }
+
+        </div>
 
       </div>
-
-      {/* BOTÓN LOGOUT */}
-      {
-        token && (
-          <button
-            onClick={logout}
-            style={{
-              background: "white",
-              color: "#003366",
-              border: "none",
-              padding: "6px 12px",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontWeight: "bold"
-            }}
-          >
-            Logout
-          </button>
-        )
-      }
 
     </nav>
   );
