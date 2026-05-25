@@ -6,56 +6,140 @@ function Purchases() {
 
   const [purchases, setPurchases] = useState([]);
 
+  // 🔥 NUEVO (para comentario opcional)
+  const [comments, setComments] = useState({});
+
+  // ===============================
+  // CARGAR COMPRAS
+  // ===============================
   const load = async () => {
-    const data = await getPurchases();
-    setPurchases(data);
+    try {
+      const data = await getPurchases();
+      setPurchases(data);
+    } catch (error) {
+      console.error("Error cargando compras", error);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
+  // ===============================
+  // MANEJAR COMENTARIO
+  // ===============================
+  const handleCommentChange = (productId, value) => {
+    setComments(prev => ({
+      ...prev,
+      [productId]: value
+    }));
+  };
+
+  // ===============================
+  // CALIFICAR
+  // ===============================
   const handleReview = async (p) => {
 
     const rating = prompt("Calificación 1-5");
+
     if (!rating) return;
 
-    await addReview({
-      productId: p.productId,
-      rating
-    });
+    const numericRating = Number(rating);
 
-    alert("Reseña enviada ⭐");
+    // 🔥 VALIDACIÓN FUERTE
+    if (numericRating < 1 || numericRating > 5) {
+      return alert("La calificación debe ser entre 1 y 5");
+    }
 
-    load();
+    try {
+
+      await addReview({
+        productId: p.productId,
+        rating: numericRating,
+        comment: comments[p.productId] || ""
+      });
+
+      alert("Reseña enviada ⭐");
+
+      load();
+
+    } catch (error) {
+      console.error("Error al calificar", error);
+
+      alert(
+        error.response?.data?.error ||
+        "Error al enviar reseña"
+      );
+    }
+
   };
 
+  // ===============================
+  // UI
+  // ===============================
   return (
-    <div>
+    <div style={{ padding: 20 }}>
 
       <h1>Mis Compras 🧾</h1>
 
       {
-        purchases.map(p => (
-          <div key={p.id} style={{ border: "1px solid gray", margin: 10, padding: 10 }}>
+        purchases.length === 0 ? (
+          <p>No tienes compras aún</p>
+        ) : (
+          purchases.map((p, index) => (
+            <div
+              key={index}
+              style={{
+                border: "1px solid gray",
+                margin: 10,
+                padding: 10,
+                borderRadius: 10
+              }}
+            >
 
-            <img src={p.image} width="100" />
+              {/* IMAGEN */}
+              {
+                p.image && (
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    width="120"
+                  />
+                )
+              }
 
-            <h3>{p.title}</h3>
-            <p>${p.price}</p>
+              <h3>{p.title}</h3>
+              <p>Precio: ${p.price}</p>
 
-            {
-              !p.reviewed ? (
-                <button onClick={() => handleReview(p)}>
-                  Calificar ⭐
-                </button>
-              ) : (
-                <p>Ya calificado ✅</p>
-              )
-            }
+              {/* 🔥 ESTADO */}
+              {
+                p.reviewed ? (
+                  <p>Ya calificado ✅</p>
+                ) : (
+                  <>
+                    <textarea
+                      placeholder="Comentario (opcional)"
+                      value={comments[p.productId] || ""}
+                      onChange={(e) =>
+                        handleCommentChange(
+                          p.productId,
+                          e.target.value
+                        )
+                      }
+                    />
 
-          </div>
-        ))
+                    <br /><br />
+
+                    <button onClick={() => handleReview(p)}>
+                      Calificar ⭐
+                    </button>
+                  </>
+                )
+              }
+
+            </div>
+          ))
+        )
       }
 
     </div>

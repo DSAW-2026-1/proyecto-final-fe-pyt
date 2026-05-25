@@ -9,7 +9,6 @@ import {
 
 import { addToCart } from "../services/cartService";
 import { getProfile } from "../services/profileService";
-import { addReview } from "../services/reviewService";
 
 function Marketplace() {
 
@@ -25,8 +24,6 @@ function Marketplace() {
     stock: "",
     image: ""
   });
-
-  const [reviewsData, setReviewsData] = useState({});
 
   // ===============================
   // CARGAR DATOS
@@ -55,15 +52,6 @@ function Marketplace() {
   }, []);
 
   // ===============================
-  // 🔥 VALIDAR SI COMPRÓ
-  // ===============================
-  const hasPurchased = (productId) => {
-    return user?.purchases?.some(
-      p => String(p.productId) === String(productId)
-    );
-  };
-
-  // ===============================
   // FORM PRODUCTO
   // ===============================
   const handleChange = (e) => {
@@ -75,6 +63,18 @@ function Marketplace() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔥 VALIDACIÓN FRONTEND
+    if (
+      !form.title ||
+      !form.price ||
+      !form.description ||
+      !form.category ||
+      !form.condition ||
+      form.stock === ""
+    ) {
+      return alert("Todos los campos son obligatorios");
+    }
 
     try {
       await createProduct(form);
@@ -115,14 +115,20 @@ function Marketplace() {
 
   const handleEdit = async (product) => {
 
-    const newTitle = prompt("Nuevo título", product.title);
-    if (!newTitle) return;
+    // 🔥 EDICIÓN COMPLETA
+    const newData = {
+      title: prompt("Título", product.title),
+      price: prompt("Precio", product.price),
+      description: prompt("Descripción", product.description),
+      category: prompt("Categoría", product.category),
+      condition: prompt("Condición", product.condition),
+      stock: prompt("Stock", product.stock),
+      image: prompt("Imagen URL", product.image)
+    };
 
     try {
-      await updateProduct(product.id, {
-        ...product,
-        title: newTitle
-      });
+
+      await updateProduct(product.id, newData);
 
       alert("Producto actualizado ✅");
       loadProducts();
@@ -139,55 +145,8 @@ function Marketplace() {
       alert("Producto agregado al carrito 🛒");
     } catch (error) {
       console.error(error);
-      alert("Error al agregar al carrito");
+      alert(error.response?.data?.error || "Error");
     }
-  };
-
-  // ===============================
-  // ⭐ RESEÑAS
-  // ===============================
-  const handleReviewChange = (productId, field, value) => {
-
-    setReviewsData(prev => ({
-      ...prev,
-      [productId]: {
-        ...prev[productId],
-        [field]: value
-      }
-    }));
-
-  };
-
-  const handleReviewSubmit = async (productId) => {
-
-    const review = reviewsData[productId];
-
-    if (!review || !review.rating) {
-      return alert("Selecciona una calificación");
-    }
-
-    try {
-
-      await addReview({
-        productId,
-        rating: review.rating,
-        comment: review.comment
-      });
-
-      alert("Reseña enviada ⭐");
-
-      setReviewsData(prev => ({
-        ...prev,
-        [productId]: { rating: "", comment: "" }
-      }));
-
-      loadProducts();
-
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.error || "Error al enviar reseña");
-    }
-
   };
 
   // ===============================
@@ -294,52 +253,6 @@ function Marketplace() {
                     <button onClick={() => handleEdit(product)}>✏️</button>
                     <button onClick={() => handleDelete(product.id)}>🗑️</button>
                   </>
-                )
-              }
-
-              <hr />
-
-              {/* ⭐ RESEÑA PROTEGIDA */}
-              {
-                hasPurchased(product.id) ? (
-
-                  <>
-                    <h4>Calificar</h4>
-
-                    <select
-                      value={reviewsData[product.id]?.rating || ""}
-                      onChange={(e) =>
-                        handleReviewChange(product.id, "rating", e.target.value)
-                      }
-                    >
-                      <option value="">Selecciona</option>
-                      <option value="5">5 ⭐</option>
-                      <option value="4">4 ⭐</option>
-                      <option value="3">3 ⭐</option>
-                      <option value="2">2 ⭐</option>
-                      <option value="1">1 ⭐</option>
-                    </select>
-
-                    <br /><br />
-
-                    <input
-                      type="text"
-                      placeholder="Comentario"
-                      value={reviewsData[product.id]?.comment || ""}
-                      onChange={(e) =>
-                        handleReviewChange(product.id, "comment", e.target.value)
-                      }
-                    />
-
-                    <br /><br />
-
-                    <button onClick={() => handleReviewSubmit(product.id)}>
-                      Enviar reseña ⭐
-                    </button>
-                  </>
-
-                ) : (
-                  <p>⚠️ Compra este producto para poder calificar</p>
                 )
               }
 

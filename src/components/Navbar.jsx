@@ -7,11 +7,8 @@ function Navbar() {
   const token = localStorage.getItem("token");
 
   const logout = () => {
-
     localStorage.removeItem("token");
-
     navigate("/login");
-
   };
 
   return (
@@ -25,42 +22,37 @@ function Navbar() {
       }}
     >
 
-      <Link to="/">
-        Home
-      </Link>
+      {/* HOME */}
+      <Link to="/">Home</Link>
 
+      {/* USUARIO LOGEADO */}
       {
         token && (
           <>
-            <Link to="/marketplace">
-              Marketplace
-            </Link>
+            <Link to="/marketplace">Marketplace</Link>
 
-            <Link to="/profile">
-              Perfil
-            </Link>
+            <Link to="/profile">Perfil</Link>
 
-            <Link to="/cart">
-              Carrito
-            </Link>
+            <Link to="/cart">Carrito</Link>
+
+            {/* 🔥 NUEVO */}
+            <Link to="/purchases">Compras</Link>
           </>
         )
       }
 
+      {/* USUARIO NO LOGEADO */}
       {
         !token && (
           <>
-            <Link to="/login">
-              Login
-            </Link>
+            <Link to="/login">Login</Link>
 
-            <Link to="/register">
-              Register
-            </Link>
+            <Link to="/register">Register</Link>
           </>
         )
       }
 
+      {/* LOGOUT */}
       {
         token && (
           <button onClick={logout}>
