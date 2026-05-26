@@ -1,0 +1,261 @@
+:root {
+  /* 🎨 COLORES SABANA */
+  --primary: #0B3C6D;
+  --primary-light: #1E5A96;
+  --primary-soft: #E6F0FA;
+
+  --gold: #C9A646;
+
+  --text: #333;
+  --text-h: #0B3C6D;
+
+  --bg: #F5F7FA;
+  --card-bg: #ffffff;
+
+  --border: #e0e0e0;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  --radius: 10px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 16px/145% var(--sans);
+  color: var(--text);
+  background: var(--bg);
+
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===================== */
+/* BASE */
+/* ===================== */
+
+body {
+  margin: 0;
+}
+
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* ===================== */
+/* TITULOS */
+/* ===================== */
+
+h1, h2, h3 {
+  color: var(--text-h);
+  margin: 10px 0;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+/* ===================== */
+/* NAVBAR */
+/* ===================== */
+
+.navbar {
+  background-color: var(--primary);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* links */
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  opacity: 0.8;
+}
+
+/* buscador */
+.navbar input {
+  width: 300px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* botón logout */
+.navbar button {
+  background: white;
+  color: var(--primary);
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* ===================== */
+/* CONTENEDOR */
+/* ===================== */
+
+.container {
+  padding: 20px;
+}
+
+/* ===================== */
+/* GRID */
+/* ===================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* ===================== */
+/* CARDS */
+/* ===================== */
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===================== */
+/* IMAGEN */
+/* ===================== */
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* contenido card */
+.card-content {
+  padding: 12px;
+}
+
+/* ===================== */
+/* BADGE (Nuevo / Usado) */
+/* ===================== */
+
+.badge {
+  position: absolute;
+  background: var(--primary-light);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  top: 10px;
+  left: 10px;
+}
+
+/* ===================== */
+/* BOTONES */
+/* ===================== */
+
+.btn {
+  background-color: var(--primary-light);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background-color: var(--primary);
+}
+
+/* botón dorado */
+.btn-gold {
+  background-color: var(--gold);
+  color: white;
+}
+
+.btn-gold:hover {
+  opacity: 0.9;
+}
+
+/* eliminar */
+.btn-danger {
+  background-color: #cc0000;
+  color: white;
+  margin-left: 5px;
+}
+
+/* secundario */
+.btn-secondary {
+  background-color: #999;
+  color: white;
+  margin-left: 5px;
+}
+
+/* ===================== */
+/* INPUTS */
+/* ===================== */
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+/* ===================== */
+/* FORM */
+/* ===================== */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ===================== */
+/* TEXTO SECUNDARIO */
+/* ===================== */
+
+.text-muted {
+  color: gray;
+  font-size: 14px;
+}
+
+/* ===================== */
+/* RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 768px) {
+
+  .navbar input {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+}
