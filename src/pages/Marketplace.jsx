@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   getProducts,
@@ -11,6 +12,8 @@ import { addToCart } from "../services/cartService";
 import { getProfile } from "../services/profileService";
 
 function Marketplace() {
+
+  const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [user, setUser] = useState(null);
@@ -444,8 +447,7 @@ function Marketplace() {
                 {/* PERFIL */}
                 <button
                   onClick={() =>
-                    window.location.href =
-                      `/seller/${product.seller}`
+                    navigate(`/seller/${product.seller}`)
                   }
                   style={secondaryButton}
                 >
@@ -558,5 +560,3 @@ const secondaryButton = {
 };
 
 export default Marketplace;
-
-

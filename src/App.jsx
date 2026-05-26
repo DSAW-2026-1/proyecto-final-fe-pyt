@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// PAGES
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -9,8 +10,10 @@ import PublicProfile from "./pages/PublicProfile";
 import Cart from "./pages/Cart";
 import Purchases from "./pages/Purchases";
 
+// COMPONENTS
 import Navbar from "./components/Navbar";
 
+// ROUTES
 import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
@@ -19,12 +22,12 @@ function App() {
 
     <BrowserRouter>
 
-      {/* 🔥 NAVBAR */}
+      {/* NAVBAR */}
       <Navbar />
 
       <Routes>
 
-        {/* HOME */}
+        {/* ================= HOME ================= */}
         <Route
           path="/"
           element={
@@ -34,7 +37,7 @@ function App() {
           }
         />
 
-        {/* MARKETPLACE */}
+        {/* ================= MARKETPLACE ================= */}
         <Route
           path="/marketplace"
           element={
@@ -44,7 +47,7 @@ function App() {
           }
         />
 
-        {/* PERFIL PRIVADO */}
+        {/* ================= PERFIL PRIVADO ================= */}
         <Route
           path="/profile"
           element={
@@ -54,7 +57,7 @@ function App() {
           }
         />
 
-        {/* 🔥 PERFIL PUBLICO VENDEDOR */}
+        {/* ================= PERFIL PÚBLICO ================= */}
         <Route
           path="/seller/:id"
           element={
@@ -64,7 +67,7 @@ function App() {
           }
         />
 
-        {/* CARRITO */}
+        {/* ================= CARRITO ================= */}
         <Route
           path="/cart"
           element={
@@ -74,7 +77,7 @@ function App() {
           }
         />
 
-        {/* COMPRAS */}
+        {/* ================= COMPRAS ================= */}
         <Route
           path="/purchases"
           element={
@@ -84,13 +87,13 @@ function App() {
           }
         />
 
-        {/* LOGIN */}
+        {/* ================= LOGIN ================= */}
         <Route
           path="/login"
           element={<Login />}
         />
 
-        {/* REGISTER */}
+        {/* ================= REGISTER ================= */}
         <Route
           path="/register"
           element={<Register />}
