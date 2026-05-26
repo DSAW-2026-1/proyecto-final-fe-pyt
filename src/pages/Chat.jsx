@@ -1,55 +1,148 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 
-function Chat({ userId }) {
+import {
+  getChats,
+  sendMessage
+} from "../services/chatService";
 
-  const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
+function Chat() {
 
-  const token = localStorage.getItem("token");
+  const [chats, setChats] = useState([]);
 
-  const loadMessages = async () => {
-    const res = await axios.get(
-      `https://proyecto-final-be-pyt.onrender.com/api/chat/${userId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-    setMessages(res.data);
+  const [receiverId, setReceiverId] = useState("");
+
+  const [message, setMessage] = useState("");
+
+  // ===============================
+  // CARGAR MENSAJES
+  // ===============================
+  const loadChats = async () => {
+
+    try {
+
+      const data = await getChats();
+
+      setChats(data);
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
   };
 
   useEffect(() => {
-    loadMessages();
+
+    loadChats();
+
   }, []);
 
-  const send = async () => {
+  // ===============================
+  // ENVIAR
+  // ===============================
+  const handleSend = async (e) => {
 
-    await axios.post(
-      "https://proyecto-final-be-pyt.onrender.com/api/chat",
-      { to: userId, message: text },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
+    e.preventDefault();
 
-    setText("");
-    loadMessages();
+    if (!receiverId || !message) {
+      return alert("Completa los campos");
+    }
+
+    try {
+
+      await sendMessage(
+        receiverId,
+        message
+      );
+
+      setMessage("");
+
+      loadChats();
+
+    } catch (error) {
+
+      alert("Error enviando mensaje");
+
+    }
+
   };
 
   return (
-    <div>
-      <h2>Chat</h2>
 
-      {messages.map((m, i) => (
-        <p key={i}>
-          <b>{m.from}</b>: {m.message}
-        </p>
-      ))}
+    <div style={{
+      padding: 30
+    }}>
 
-      <input value={text} onChange={(e) => setText(e.target.value)} />
-      <button onClick={send}>Enviar</button>
+      <h1>Mensajes 💬</h1>
+
+      {/* FORM */}
+      <form onSubmit={handleSend}>
+
+        <input
+          placeholder="ID destinatario"
+          value={receiverId}
+          onChange={(e) =>
+            setReceiverId(e.target.value)
+          }
+        />
+
+        <br /><br />
+
+        <textarea
+          placeholder="Mensaje"
+          value={message}
+          onChange={(e) =>
+            setMessage(e.target.value)
+          }
+        />
+
+        <br /><br />
+
+        <button>
+          Enviar
+        </button>
+
+      </form>
+
+      <hr />
+
+      {/* MENSAJES */}
+      {
+        chats.map((chat, index) => (
+
+          <div
+            key={index}
+            style={{
+              border: "1px solid #ccc",
+              padding: 10,
+              marginBottom: 10
+            }}
+          >
+
+            <p>
+              <strong>De:</strong>
+              {" "}
+              {chat.senderId}
+            </p>
+
+            <p>
+              <strong>Para:</strong>
+              {" "}
+              {chat.receiverId}
+            </p>
+
+            <p>{chat.message}</p>
+
+          </div>
+
+        ))
+      }
+
     </div>
+
   );
+
 }
 
 export default Chat;

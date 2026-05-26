@@ -3,82 +3,123 @@ import { Link, useNavigate } from "react-router-dom";
 function Navbar() {
 
   const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
 
+  // ===============================
+  // LOGOUT
+  // ===============================
   const logout = () => {
+
     localStorage.removeItem("token");
+
     navigate("/login");
+
   };
 
   return (
+
     <nav style={{
-      background: "#0B3C6D",
+      background: "linear-gradient(90deg, #0B3C6D, #1E5A96)",
       color: "white",
-      padding: "10px 20px"
+      padding: "15px 25px",
+      boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+      position: "sticky",
+      top: 0,
+      zIndex: 1000
     }}>
 
       <div style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        maxWidth: "1200px",
-        margin: "auto"
+        maxWidth: "1400px",
+        margin: "auto",
+        gap: "20px"
       }}>
 
-        {/* LOGO */}
-        <div style={{
-          fontWeight: "bold",
-          fontSize: "20px"
-        }}>
-          Mercado Sabana
+        {/* ===============================
+            LOGO
+        =============================== */}
+        <div
+          onClick={() => navigate("/marketplace")}
+          style={{
+            fontWeight: "bold",
+            fontSize: "24px",
+            cursor: "pointer",
+            whiteSpace: "nowrap"
+          }}
+        >
+          Mercado Sabana 🛒
         </div>
 
-        {/* BUSCADOR */}
+        {/* ===============================
+            BUSCADOR
+        =============================== */}
         {
           token && (
+
             <input
               type="text"
               placeholder="Buscar productos..."
               style={{
-                width: "300px",
-                padding: "6px 10px",
-                borderRadius: "6px",
+                flex: 1,
+                maxWidth: "450px",
+                padding: "10px 14px",
+                borderRadius: "10px",
                 border: "none",
-                outline: "none"
+                outline: "none",
+                fontSize: "15px"
               }}
             />
+
           )
         }
 
-        {/* LINKS */}
+        {/* ===============================
+            LINKS
+        =============================== */}
         <div style={{
           display: "flex",
+          alignItems: "center",
           gap: "15px",
-          alignItems: "center"
+          flexWrap: "wrap"
         }}>
 
-          <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-            Home
-          </Link>
+          {/* HOME */}
+          <NavItem to="/">
+            🏠 Home
+          </NavItem>
 
           {
-            token && (
+            token ? (
+
               <>
-                <Link to="/marketplace" style={{ color: "white", textDecoration: "none" }}>
-                  Marketplace
-                </Link>
 
-                <Link to="/cart" style={{ color: "white", textDecoration: "none" }}>
-                  🛒
-                </Link>
+                {/* MARKETPLACE */}
+                <NavItem to="/marketplace">
+                  🛍️ Marketplace
+                </NavItem>
 
-                <Link to="/purchases" style={{ color: "white", textDecoration: "none" }}>
-                  Compras
-                </Link>
+                {/* CHAT */}
+                <NavItem to="/chat">
+                  💬 Mensajes
+                </NavItem>
 
-                <Link to="/profile" style={{ color: "white", textDecoration: "none" }}>
-                  Perfil
-                </Link>
+                {/* CARRITO */}
+                <NavItem to="/cart">
+                  🛒 Carrito
+                </NavItem>
+
+                {/* COMPRAS */}
+                <NavItem to="/purchases">
+                  📦 Compras
+                </NavItem>
+
+                {/* PERFIL */}
+                <NavItem to="/profile">
+                  👤 Perfil
+                </NavItem>
 
                 {/* LOGOUT */}
                 <button
@@ -87,29 +128,34 @@ function Navbar() {
                     background: "#C9A646",
                     color: "white",
                     border: "none",
-                    padding: "6px 12px",
-                    borderRadius: "6px",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
                     cursor: "pointer",
-                    fontWeight: "bold"
+                    fontWeight: "bold",
+                    transition: "0.2s"
                   }}
                 >
                   Logout
                 </button>
-              </>
-            )
-          }
 
-          {
-            !token && (
+              </>
+
+            ) : (
+
               <>
-                <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-                  Login
-                </Link>
 
-                <Link to="/register" style={{ color: "white", textDecoration: "none" }}>
+                {/* LOGIN */}
+                <NavItem to="/login">
+                  Login
+                </NavItem>
+
+                {/* REGISTER */}
+                <NavItem to="/register">
                   Register
-                </Link>
+                </NavItem>
+
               </>
+
             )
           }
 
@@ -118,7 +164,32 @@ function Navbar() {
       </div>
 
     </nav>
+
   );
+
+}
+
+// ===============================
+// COMPONENTE LINK
+// ===============================
+function NavItem({ to, children }) {
+
+  return (
+
+    <Link
+      to={to}
+      style={{
+        color: "white",
+        textDecoration: "none",
+        fontWeight: "500",
+        transition: "0.2s"
+      }}
+    >
+      {children}
+    </Link>
+
+  );
+
 }
 
 export default Navbar;

@@ -196,6 +196,15 @@ function Marketplace() {
   };
 
   // ===============================
+  // CHAT
+  // ===============================
+  const handleChat = (sellerId) => {
+
+    navigate(`/chat?seller=${sellerId}`);
+
+  };
+
+  // ===============================
   // UI
   // ===============================
   return (
@@ -452,6 +461,19 @@ function Marketplace() {
                   style={secondaryButton}
                 >
                   Ver perfil
+                </button>
+
+                {/* CHAT */}
+                <button
+                  onClick={() =>
+                    handleChat(product.seller)
+                  }
+                  style={{
+                    ...secondaryButton,
+                    background: "#1E5A96"
+                  }}
+                >
+                  💬 Contactar vendedor
                 </button>
 
                 {/* CARRITO */}

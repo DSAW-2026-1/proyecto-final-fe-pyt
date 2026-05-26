@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import Cart from "./pages/Cart";
 import Purchases from "./pages/Purchases";
+import Chat from "./pages/Chat";
 
 // COMPONENTS
 import Navbar from "./components/Navbar";
@@ -97,6 +98,16 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        {/* ================= CHAT ================= */}
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute>
+              <Chat />
+            </PrivateRoute>
+          }
         />
 
       </Routes>
