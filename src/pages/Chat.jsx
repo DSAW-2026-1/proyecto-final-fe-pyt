@@ -5,11 +5,19 @@ import {
   sendMessage
 } from "../services/chatService";
 
+import {
+  useSearchParams
+} from "react-router-dom";
+
 function Chat() {
 
-  const [chats, setChats] = useState([]);
+  const [searchParams] = useSearchParams();
 
-  const [receiverId, setReceiverId] = useState("");
+  // 🔥 vendedor automático
+  const sellerId =
+    searchParams.get("seller");
+
+  const [chats, setChats] = useState([]);
 
   const [message, setMessage] = useState("");
 
@@ -22,7 +30,14 @@ function Chat() {
 
       const data = await getChats();
 
-      setChats(data);
+      // 🔥 filtrar conversación
+      const filtered = data.filter(
+        chat =>
+          chat.senderId === sellerId ||
+          chat.receiverId === sellerId
+      );
+
+      setChats(filtered);
 
     } catch (error) {
 
@@ -45,14 +60,14 @@ function Chat() {
 
     e.preventDefault();
 
-    if (!receiverId || !message) {
-      return alert("Completa los campos");
+    if (!message) {
+      return alert("Escribe un mensaje");
     }
 
     try {
 
       await sendMessage(
-        receiverId,
+        sellerId,
         message
       );
 
@@ -71,73 +86,78 @@ function Chat() {
   return (
 
     <div style={{
-      padding: 30
+      padding: 30,
+      maxWidth: 700,
+      margin: "auto"
     }}>
 
-      <h1>Mensajes 💬</h1>
+      <h1>Chat 💬</h1>
 
-      {/* FORM */}
+      {/* MENSAJES */}
+      <div style={{
+        background: "white",
+        borderRadius: 12,
+        padding: 20,
+        minHeight: 400,
+        marginBottom: 20
+      }}>
+
+        {
+          chats.map((chat, index) => (
+
+            <div
+              key={index}
+              style={{
+                marginBottom: 15,
+                background: "#F5F5F5",
+                padding: 10,
+                borderRadius: 10
+              }}
+            >
+
+              <p>
+                {chat.message}
+              </p>
+
+            </div>
+
+          ))
+        }
+
+      </div>
+
+      {/* INPUT */}
       <form onSubmit={handleSend}>
 
-        <input
-          placeholder="ID destinatario"
-          value={receiverId}
-          onChange={(e) =>
-            setReceiverId(e.target.value)
-          }
-        />
-
-        <br /><br />
-
         <textarea
-          placeholder="Mensaje"
+          placeholder="Escribe un mensaje..."
           value={message}
           onChange={(e) =>
             setMessage(e.target.value)
           }
+          style={{
+            width: "100%",
+            height: 100,
+            padding: 10,
+            borderRadius: 10
+          }}
         />
 
         <br /><br />
 
-        <button>
+        <button
+          style={{
+            background: "#0B3C6D",
+            color: "white",
+            border: "none",
+            padding: "12px 20px",
+            borderRadius: 10
+          }}
+        >
           Enviar
         </button>
 
       </form>
-
-      <hr />
-
-      {/* MENSAJES */}
-      {
-        chats.map((chat, index) => (
-
-          <div
-            key={index}
-            style={{
-              border: "1px solid #ccc",
-              padding: 10,
-              marginBottom: 10
-            }}
-          >
-
-            <p>
-              <strong>De:</strong>
-              {" "}
-              {chat.senderId}
-            </p>
-
-            <p>
-              <strong>Para:</strong>
-              {" "}
-              {chat.receiverId}
-            </p>
-
-            <p>{chat.message}</p>
-
-          </div>
-
-        ))
-      }
 
     </div>
 
